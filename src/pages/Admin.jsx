@@ -30,7 +30,7 @@ function Input({ label, value, onChange, type = 'text', placeholder }) {
           padding: '10px 14px', fontSize: 14,
           outline: 'none', transition: 'border-color 0.2s',
         }}
-        onFocus={e => e.target.style.borderColor = 'var(--red)'}
+        onFocus={e => e.target.style.borderColor = 'var(--green)'}
         onBlur={e => e.target.style.borderColor = 'var(--border)'}
       />
     </div>
@@ -132,7 +132,7 @@ export default function Admin() {
         }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
             <div style={{
-              width: 56, height: 56, background: 'var(--red)',
+              width: 56, height: 56, background: 'var(--green)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               margin: '0 auto 20px',
               clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)',
@@ -154,7 +154,7 @@ export default function Admin() {
               placeholder="••••••••"
             />
             {passwordError && (
-              <p style={{ color: 'var(--red)', fontSize: 12, fontFamily: 'var(--font-condensed)', letterSpacing: 1 }}>
+              <p style={{ color: 'var(--green)', fontSize: 12, fontFamily: 'var(--font-condensed)', letterSpacing: 1 }}>
                 Mot de passe incorrect
               </p>
             )}
@@ -162,14 +162,14 @@ export default function Admin() {
               onClick={handleLogin}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
               style={{
-                background: 'var(--red)', color: '#fff',
+                background: 'var(--green)', color: '#fff',
                 padding: '14px', marginTop: 8,
                 fontFamily: 'var(--font-condensed)', fontSize: 15, fontWeight: 700,
                 letterSpacing: 2, textTransform: 'uppercase',
                 transition: 'background 0.2s',
               }}
-              onMouseEnter={e => e.target.style.background = 'var(--red-dark)'}
-              onMouseLeave={e => e.target.style.background = 'var(--red)'}
+              onMouseEnter={e => e.target.style.background = 'var(--green-dark)'}
+              onMouseLeave={e => e.target.style.background = 'var(--green)'}
             >
               Se connecter
             </button>
@@ -192,7 +192,7 @@ export default function Admin() {
           <div style={{
             fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: 3,
           }}>
-            CTK<span style={{ color: 'var(--red)' }}>&</span>BM
+            CTK<span style={{ color: 'var(--green)' }}>&</span>BM
             <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 13, letterSpacing: 3, color: 'var(--grey)', marginLeft: 12 }}>
               ADMIN
             </span>
@@ -235,7 +235,7 @@ export default function Admin() {
               fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 1,
               transition: 'all 0.2s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--red)'; e.currentTarget.style.color = 'var(--red)'; }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green)'; e.currentTarget.style.color = 'var(--green)'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--grey)'; }}
           >
             <LogOut size={13} /> Déconnexion
@@ -250,7 +250,7 @@ export default function Admin() {
         }}>
           {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
             <div key={key} style={{
-              background: 'var(--card)', border: `1px solid ${activeCategory === key ? 'var(--red)' : 'var(--border)'}`,
+              background: 'var(--card)', border: `1px solid ${activeCategory === key ? 'var(--green)' : 'var(--border)'}`,
               padding: '20px 24px',
               cursor: 'pointer',
               transition: 'border-color 0.2s',
@@ -258,7 +258,7 @@ export default function Admin() {
               onClick={() => setActiveCategory(key)}
             >
               <div style={{ fontSize: 24, marginBottom: 6 }}>{icon}</div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, color: key === activeCategory ? 'var(--red)' : 'var(--white)' }}>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: 32, color: key === activeCategory ? 'var(--green)' : 'var(--white)' }}>
                 {products.filter(p => p.category === key).length}
               </div>
               <div style={{ fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 2, color: 'var(--grey)', textTransform: 'uppercase' }}>
@@ -278,10 +278,10 @@ export default function Admin() {
               <button key={key} onClick={() => setActiveCategory(key)} style={{
                 padding: '8px 20px',
                 fontFamily: 'var(--font-condensed)', fontSize: 14, letterSpacing: 2, textTransform: 'uppercase',
-                background: activeCategory === key ? 'var(--red)' : 'transparent',
+                background: activeCategory === key ? 'var(--green)' : 'transparent',
                 color: activeCategory === key ? '#fff' : 'var(--grey)',
                 border: '1px solid',
-                borderColor: activeCategory === key ? 'var(--red)' : 'var(--border)',
+                borderColor: activeCategory === key ? 'var(--green)' : 'var(--border)',
                 transition: 'all 0.2s',
               }}>
                 {icon} {label}
@@ -292,13 +292,13 @@ export default function Admin() {
             onClick={() => { setForm({ ...emptyForm, category: activeCategory }); setEditing(false); setShowForm(true); }}
             style={{
               display: 'flex', alignItems: 'center', gap: 8,
-              background: 'var(--red)', color: '#fff',
+              background: 'var(--green)', color: '#fff',
               padding: '10px 22px',
               fontFamily: 'var(--font-condensed)', fontSize: 14, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
               transition: 'background 0.2s',
             }}
-            onMouseEnter={e => e.target.style.background = 'var(--red-dark)'}
-            onMouseLeave={e => e.target.style.background = 'var(--red)'}
+            onMouseEnter={e => e.target.style.background = 'var(--green-dark)'}
+            onMouseLeave={e => e.target.style.background = 'var(--green)'}
           >
             <Plus size={16} /> Ajouter
           </button>
@@ -336,7 +336,7 @@ export default function Admin() {
                   {product.name}
                   {product.badge && (
                     <span style={{
-                      marginLeft: 8, background: 'var(--red)', color: '#fff',
+                      marginLeft: 8, background: 'var(--green)', color: '#fff',
                       fontSize: 10, letterSpacing: 1, textTransform: 'uppercase',
                       padding: '2px 7px', fontFamily: 'var(--font-condensed)',
                     }}>
@@ -344,7 +344,7 @@ export default function Admin() {
                     </span>
                   )}
                 </div>
-                <div style={{ color: 'var(--red)', fontFamily: 'var(--font-display)', fontSize: 18, marginTop: 2 }}>
+                <div style={{ color: 'var(--green)', fontFamily: 'var(--font-display)', fontSize: 18, marginTop: 2 }}>
                   {formatPrice(product.price)}
                 </div>
                 <div style={{ color: 'var(--grey)', fontSize: 12, marginTop: 2 }}>
@@ -373,7 +373,7 @@ export default function Admin() {
                     <button
                       onClick={() => handleDelete(product.id)}
                       style={{
-                        background: 'var(--red)', color: '#fff',
+                        background: 'var(--green)', color: '#fff',
                         padding: '8px 12px', fontSize: 12,
                         fontFamily: 'var(--font-condensed)', letterSpacing: 1,
                       }}
@@ -398,7 +398,7 @@ export default function Admin() {
                       padding: '8px 10px',
                       transition: 'all 0.2s',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--red)'; e.currentTarget.style.color = 'var(--red)'; }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--green)'; e.currentTarget.style.color = 'var(--green)'; }}
                     onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--grey)'; }}
                   >
                     <Trash2 size={14} />
@@ -488,7 +488,7 @@ export default function Admin() {
                       padding: '9px 14px', fontSize: 13, outline: 'none',
                       transition: 'border-color 0.2s',
                     }}
-                    onFocus={e => e.target.style.borderColor = 'var(--red)'}
+                    onFocus={e => e.target.style.borderColor = 'var(--green)'}
                     onBlur={e => e.target.style.borderColor = 'var(--border)'}
                   />
                 ))}
@@ -510,7 +510,7 @@ export default function Admin() {
                 <button
                   onClick={handleSubmit}
                   style={{
-                    flex: 1, background: 'var(--red)', color: '#fff',
+                    flex: 1, background: 'var(--green)', color: '#fff',
                     padding: '14px',
                     fontFamily: 'var(--font-condensed)', fontSize: 15, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -518,8 +518,8 @@ export default function Admin() {
                     opacity: (!form.name || !form.price || !form.image) ? 0.5 : 1,
                   }}
                   disabled={!form.name || !form.price || !form.image}
-                  onMouseEnter={e => { if (form.name && form.price && form.image) e.target.style.background = 'var(--red-dark)'; }}
-                  onMouseLeave={e => e.target.style.background = 'var(--red)'}
+                  onMouseEnter={e => { if (form.name && form.price && form.image) e.target.style.background = 'var(--green-dark)'; }}
+                  onMouseLeave={e => e.target.style.background = 'var(--green)'}
                 >
                   <Check size={16} />
                   {editing ? 'Enregistrer les modifications' : 'Ajouter le produit'}
