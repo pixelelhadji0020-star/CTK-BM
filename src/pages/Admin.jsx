@@ -6,7 +6,7 @@ const ADMIN_PASSWORD = 'ctkbm2024';
 
 const emptyForm = {
   id: '', category: 'telephones', name: '',
-  price: '', image: '', specs: ['', '', '', '', ''], badge: '',
+  price: '', images: [], specs: ['', '', '', '', ''], badge: '',
 };
 
 // Convertit un fichier image en base64
