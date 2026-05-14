@@ -488,77 +488,132 @@ export default function Admin() {
                 onChange={v => setForm(f => ({ ...f, price: v }))}
                 type="number" placeholder="Ex: 650000" />
 
-              {/* IMAGE — bouton galerie + URL */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 11,
-                  letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-                }}>Image *</label>
+              {/* IMAGE */}
+<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+  <label style={{
+    fontFamily: 'var(--font-condensed)', fontSize: 11,
+    letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+  }}>
+    Photos * (max 4) — {form.images?.length || 0}/4
+  </label>
 
-                {/* Bouton principal galerie */}
-                <input
-                  ref={fileInputRef} type="file"
-                  accept="image/*"
-                  onChange={handleImagePick}
-                  style={{ display: 'none' }}
-                />
-                <button onClick={() => fileInputRef.current?.click()} style={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-                  background: imageLoading ? 'rgba(201,168,76,0.1)' : 'rgba(201,168,76,0.08)',
-                  border: '2px dashed rgba(201,168,76,0.4)',
-                  color: imageLoading ? 'var(--grey)' : 'var(--gold-light)',
-                  padding: '18px', borderRadius: 10,
-                  fontFamily: 'var(--font-condensed)', fontSize: 15,
-                  letterSpacing: 1.5, textTransform: 'uppercase',
-                  transition: 'all 0.2s', width: '100%',
-                  minHeight: 60,
-                }}
-                  onMouseEnter={e => { if (!imageLoading) e.currentTarget.style.background = 'rgba(201,168,76,0.14)'; }}
-                  onMouseLeave={e => { if (!imageLoading) e.currentTarget.style.background = 'rgba(201,168,76,0.08)'; }}
-                >
-                  <ImagePlus size={20} />
-                  {imageLoading ? 'Chargement...' : 'Choisir depuis la galerie'}
-                </button>
+  {/* Bouton galerie — multiple */}
+  <input
+    ref={fileInputRef} type="file"
+    accept="image/*" multiple
+    onChange={handleImagePick}
+    style={{ display: 'none' }}
+  />
 
-                {/* Séparateur OU */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                  <span style={{ color: 'var(--grey)', fontSize: 11, fontFamily: 'var(--font-condensed)', letterSpacing: 2 }}>OU</span>
-                  <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-                </div>
+  {/* Prévisualisations */}
+  {form.images?.length > 0 && (
+    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+      {form.images.map((src, i) => (
+        <div key={i} style={{ position: 'relative', flexShrink: 0 }}>
+          <img src={src} alt={`photo ${i + 1}`} style={{
+            width: 80, height: 80, objectFit: 'cover',
+            borderRadius: 8,
+            border: i === 0 ? '2px solid var(--gold)' : '1px solid var(--border)',
+          }} />
+          {/* Supprimer */}
+          <button onClick={() => setForm(f => ({
+            ...f, images: f.images.filter((_, idx) => idx !== i),
+          }))} style={{
+            position: 'absolute', top: -6, right: -6,
+            background: '#e05252', color: '#fff',
+            borderRadius: '50%', width: 20, height: 20,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 10,
+          }}>
+            <X size={11} />
+          </button>
+          {/* Badge "principale" */}
+          {i === 0 && (
+            <div style={{
+              position: 'absolute', bottom: 4, left: 4,
+              background: 'var(--gold)', color: '#000',
+              fontSize: 8, fontFamily: 'var(--font-condensed)',
+              letterSpacing: 1, padding: '1px 5px', borderRadius: 3,
+            }}>
+              PRINCIPALE
+            </div>
+          )}
+        </div>
+      ))}
 
-                {/* URL manuelle */}
-                <input type="text" value={form.image.startsWith('data:') ? '' : form.image}
-                  onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
-                  placeholder="Coller un lien URL d'image..."
-                  style={{
-                    background: 'var(--black)', border: '1px solid var(--border)',
-                    color: 'var(--white)', padding: '11px 14px', fontSize: 13,
-                    borderRadius: 6, outline: 'none',
-                  }}
-                  onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-                  onBlur={e => e.target.style.borderColor = 'var(--border)'}
-                />
+      {/* Ajouter une photo supplémentaire */}
+      {form.images.length < 4 && (
+        <button onClick={() => fileInputRef.current?.click()} style={{
+          width: 80, height: 80, flexShrink: 0,
+          border: '2px dashed rgba(201,168,76,0.35)',
+          borderRadius: 8, color: 'var(--gold)',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          fontSize: 10, gap: 4,
+          fontFamily: 'var(--font-condensed)', letterSpacing: 1,
+          background: 'rgba(201,168,76,0.04)',
+        }}>
+          <ImagePlus size={18} />
+          Ajouter
+        </button>
+      )}
+    </div>
+  )}
 
-                {/* Preview */}
-                {form.image && (
-                  <div style={{ position: 'relative' }}>
-                    <img src={form.image} alt="aperçu" style={{
-                      width: '100%', height: 160, objectFit: 'cover',
-                      borderRadius: 8, border: '1px solid var(--border)',
-                    }} onError={e => e.target.style.display = 'none'} />
-                    <button onClick={() => setForm(f => ({ ...f, image: '' }))} style={{
-                      position: 'absolute', top: 8, right: 8,
-                      background: 'rgba(0,0,0,0.7)', color: '#fff',
-                      borderRadius: '50%', width: 28, height: 28,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      <X size={14} />
-                    </button>
-                  </div>
-                )}
-              </div>
+  {/* Bouton principal si aucune image */}
+  {(!form.images || form.images.length === 0) && (
+    <button onClick={() => fileInputRef.current?.click()} style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+      background: imageLoading ? 'rgba(201,168,76,0.06)' : 'rgba(201,168,76,0.08)',
+      border: '2px dashed rgba(201,168,76,0.4)',
+      color: imageLoading ? 'var(--grey)' : 'var(--gold-light)',
+      padding: '20px', borderRadius: 10,
+      fontFamily: 'var(--font-condensed)', fontSize: 15,
+      letterSpacing: 1.5, textTransform: 'uppercase',
+      width: '100%', minHeight: 60,
+    }}>
+      <ImagePlus size={20} />
+      {imageLoading ? 'Chargement...' : 'Choisir depuis la galerie'}
+    </button>
+  )}
 
+  {/* Séparateur OU + URL */}
+  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+    <span style={{ color: 'var(--grey)', fontSize: 11, fontFamily: 'var(--font-condensed)', letterSpacing: 2 }}>OU URL</span>
+    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+  </div>
+  <div style={{ display: 'flex', gap: 8 }}>
+    <input type="text" id="urlInput" placeholder="Coller un lien URL..."
+      style={{
+        flex: 1, background: 'var(--black)', border: '1px solid var(--border)',
+        color: 'var(--white)', padding: '10px 14px', fontSize: 13,
+        borderRadius: 6, outline: 'none',
+      }}
+      onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+      onBlur={e => e.target.style.borderColor = 'var(--border)'}
+      onKeyDown={e => {
+        if (e.key === 'Enter' && e.target.value.trim() && (form.images?.length || 0) < 4) {
+          setForm(f => ({ ...f, images: [...(f.images || []), e.target.value.trim()] }));
+          e.target.value = '';
+        }
+      }}
+    />
+    <button onClick={() => {
+      const input = document.getElementById('urlInput');
+      if (input?.value.trim() && (form.images?.length || 0) < 4) {
+        setForm(f => ({ ...f, images: [...(f.images || []), input.value.trim()] }));
+        input.value = '';
+      }
+    }} style={{
+      background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)',
+      color: 'var(--gold)', padding: '10px 14px', borderRadius: 6,
+      fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 1,
+    }}>
+      + Ajouter
+    </button>
+  </div>
+</div>
               <GoldInput label="Badge (optionnel)" value={form.badge}
                 onChange={v => setForm(f => ({ ...f, badge: v }))}
                 placeholder="Ex: Nouveau, Premium..." />
