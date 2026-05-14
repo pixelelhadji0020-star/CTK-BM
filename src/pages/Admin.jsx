@@ -648,19 +648,11 @@ export default function Admin() {
               {/* Submit */}
               <div style={{ display: 'flex', gap: 10, paddingBottom: 8 }}>
                 <button onClick={handleSubmit}
-                  disabled={!form.name || !form.price || !form.image}
-                  style={{
-                    flex: 1,
-                    background: (!form.name || !form.price || !form.image)
-                      ? 'var(--border)'
-                      : 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-                    color: (!form.name || !form.price || !form.image) ? 'var(--grey)' : '#000',
-                    padding: '14px', borderRadius: 8,
-                    fontFamily: 'var(--font-condensed)', fontSize: 15,
-                    fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                    transition: 'opacity 0.2s',
-                    cursor: (!form.name || !form.price || !form.image) ? 'not-allowed' : 'pointer',
+                  disabled={!form.name || !form.price || !form.images?.length}
+// et
+color: (!form.name || !form.price || !form.images?.length) ? 'var(--grey)' : '#000',
+background: (!form.name || !form.price || !form.images?.length) ? 'var(--border)' : 'linear-gradient(...)',
+cursor: (!form.name || !form.price || !form.images?.length) ? 'not-allowed' : 'pointer',
                   }}
                 >
                   <Check size={16} />
