@@ -12,17 +12,13 @@ export default function CategoryPage() {
   }, [category]);
 
   if (!CATEGORIES[category]) return <Navigate to="/" replace />;
-
   const { label, icon } = CATEGORIES[category];
 
   return (
     <div style={{ paddingTop: 60 }}>
-      {/* Hero */}
       <div style={{
-        background: 'var(--deep)',
-        borderBottom: '1px solid var(--border)',
-        padding: '48px 16px 36px',
-        textAlign: 'center',
+        background: 'var(--deep)', borderBottom: '1px solid var(--border)',
+        padding: '48px 16px 36px', textAlign: 'center',
       }}>
         <div style={{ fontSize: 40, marginBottom: 8 }}>{icon}</div>
         <h1 style={{
@@ -40,7 +36,6 @@ export default function CategoryPage() {
         </p>
       </div>
 
-      {/* Products */}
       <div className="container" style={{ padding: '40px 16px 60px' }}>
         {products.length === 0 ? (
           <div style={{
@@ -58,8 +53,7 @@ export default function CategoryPage() {
             gap: 20,
           }}>
             {products.map((product, i) => (
-              <div key={product.id}
-                style={{ animation: `fadeUp 0.4s ${i * 0.06}s both` }}>
+              <div key={product.id} style={{ animation: `fadeUp 0.4s ${i * 0.06}s both` }}>
                 <ProductCard product={product} />
               </div>
             ))}
