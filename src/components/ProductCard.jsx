@@ -1,8 +1,20 @@
-import React from 'react';
-import { MessageCircle, CheckCircle2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatPrice, buildWhatsAppUrl } from '../data/products';
 
 export default function ProductCard({ product }) {
+  const images = product.images || (product.image ? [product.image] : []);
+  const [current, setCurrent] = useState(0);
+
+  function prev(e) {
+    e.stopPropagation();
+    setCurrent(i => (i - 1 + images.length) % images.length);
+  }
+  function next(e) {
+    e.stopPropagation();
+    setCurrent(i => (i + 1) % images.length);
+  }
+
   return (
     <div style={{
       background: 'var(--card)',
@@ -22,19 +34,33 @@ export default function ProductCard({ product }) {
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
-      {/* Image */}
-      <div style={{ position: 'relative', height: 200, overflow: 'hidden', flexShrink: 0 }}>
-        <img src={product.image} alt={product.name} style={{
-          width: '100%', height: '100%', objectFit: 'cover',
-          transition: 'transform 0.4s ease',
-        }}
-          onMouseEnter={e => e.target.style.transform = 'scale(1.05)'}
-          onMouseLeave={e => e.target.style.transform = 'scale(1)'}
-        />
+      {/* ── IMAGE CAROUSEL ── */}
+      <div style={{ position: 'relative', height: 220, overflow: 'hidden', flexShrink: 0, background: '#0a0a0a' }}>
+
+        {/* Slides — scroll horizontal superposé */}
         <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(to top, rgba(6,6,6,0.55) 0%, transparent 55%)',
+          display: 'flex',
+          width: `${images.length * 100}%`,
+          height: '100%',
+          transform: `translateX(-${current * (100 / images.length)}%)`,
+          transition: 'transform 0.4s cubic-bezier(0.4,0,0.2,1)',
+        }}>
+          {images.map((src, i) => (
+            <div key={i} style={{ width: `${100 / images.length}%`, height: '100%', flexShrink: 0 }}>
+              <img src={src} alt={`${product.name} ${i + 1}`} style={{
+                width: '100%', height: '100%', objectFit: 'cover',
+              }} />
+            </div>
+          ))}
+        </div>
+
+        {/* Gradient bas */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none',
+          background: 'linear-gradient(to top, rgba(6,6,6,0.6) 0%, transparent 50%)',
         }} />
+
+        {/* Badge */}
         {product.badge && (
           <div style={{
             position: 'absolute', top: 10, left: 10,
@@ -46,9 +72,75 @@ export default function ProductCard({ product }) {
             {product.badge}
           </div>
         )}
+
+        {/* Flèches (seulement si plusieurs images) */}
+        {images.length > 1 && (
+          <>
+            <button onClick={prev} style={{
+              position: 'absolute', left: 8, top: '50%', transform: 'translateY(-50%)',
+              background: 'rgba(0,0,0,0.55)', color: '#fff',
+              width: 30, height: 30, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
+              transition: 'background 0.2s',
+              zIndex: 2,
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.7)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.55)'}
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button onClick={next} style={{
+              position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)',
+              background: 'rgba(0,0,0,0.55)', color: '#fff',
+              width: 30, height: 30, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)',
+              transition: 'background 0.2s',
+              zIndex: 2,
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = 'rgba(201,168,76,0.7)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.55)'}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </>
+        )}
+
+        {/* Dots */}
+        {images.length > 1 && (
+          <div style={{
+            position: 'absolute', bottom: 10, left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex', gap: 5, zIndex: 2,
+          }}>
+            {images.map((_, i) => (
+              <button key={i} onClick={e => { e.stopPropagation(); setCurrent(i); }} style={{
+                width: i === current ? 16 : 6,
+                height: 6, borderRadius: 3,
+                background: i === current ? 'var(--gold-light)' : 'rgba(255,255,255,0.35)',
+                transition: 'width 0.3s, background 0.3s',
+                padding: 0,
+              }} />
+            ))}
+          </div>
+        )}
+
+        {/* Compteur */}
+        {images.length > 1 && (
+          <div style={{
+            position: 'absolute', top: 10, right: 10,
+            background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+            color: 'var(--gold-light)',
+            fontFamily: 'var(--font-condensed)', fontSize: 11, letterSpacing: 1,
+            padding: '3px 8px', borderRadius: 99,
+          }}>
+            {current + 1}/{images.length}
+          </div>
+        )}
       </div>
 
-      {/* Content */}
+      {/* ── CONTENT ── */}
       <div style={{ padding: '16px', flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
         <div>
           <h3 style={{
@@ -68,7 +160,6 @@ export default function ProductCard({ product }) {
           </div>
         </div>
 
-        {/* Specs */}
         <ul style={{ listStyle: 'none', flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
           {product.specs.map((spec, i) => (
             <li key={i} style={{
@@ -81,7 +172,6 @@ export default function ProductCard({ product }) {
           ))}
         </ul>
 
-        {/* WhatsApp CTA */}
         <a href={buildWhatsAppUrl(product)}
           target="_blank" rel="noopener noreferrer"
           style={{
