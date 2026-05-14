@@ -96,23 +96,22 @@ export default function Admin() {
 }
 
   function handleSubmit() {
-    if (!form.name || !form.price || !form.image) return;
-    const product = {
-      ...form,
-      price: Number(form.price),
-      specs: form.specs.filter(s => s.trim()),
-      badge: form.badge.trim() || null,
-      id: editing ? form.id : `${form.category}-${Date.now()}`,
-    };
-    const updated = editing
-      ? products.map(p => p.id === product.id ? product : p)
-      : [...products, product];
-    persist(updated);
-    setShowForm(false);
-    setForm(emptyForm);
-    setEditing(false);
-  }
-
+  if (!form.name || !form.price || !form.images?.length) return;
+  const product = {
+    ...form,
+    price: Number(form.price),
+    specs: form.specs.filter(s => s.trim()),
+    badge: form.badge.trim() || null,
+    id: editing ? form.id : `${form.category}-${Date.now()}`,
+  };
+  const updated = editing
+    ? products.map(p => p.id === product.id ? product : p)
+    : [...products, product];
+  persist(updated);
+  setShowForm(false);
+  setForm(emptyForm);
+  setEditing(false);
+}
   function handleEdit(product) {
     setForm({
       ...product,
