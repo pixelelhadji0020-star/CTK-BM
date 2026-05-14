@@ -8,35 +8,35 @@ export default function Footer() {
     <footer style={{
       background: 'var(--deep)',
       borderTop: '1px solid var(--border)',
-      padding: '60px 0 30px',
-      marginTop: 80,
+      padding: '48px 0 24px',
+      marginTop: 60,
     }}>
       <div className="container">
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 40,
-          marginBottom: 48,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: 36, marginBottom: 40,
         }}>
           {/* Brand */}
           <div>
             <div style={{
-              fontFamily: 'var(--font-display)', fontSize: 32, letterSpacing: 4,
-              marginBottom: 12,
+              fontFamily: 'var(--font-display)', fontSize: 28,
+              letterSpacing: 4, marginBottom: 10,
             }}>
-              CTK<span style={{ color: 'var(--red)' }}>&</span>BM
+              CTK<span style={{ color: 'var(--green)' }}>&</span>BM
             </div>
-            <p style={{ color: 'var(--grey)', fontSize: 13, lineHeight: 1.8 }}>
-              Votre partenaire de confiance pour les téléphones, voitures et chaussures de qualité au Sénégal.
+            <p style={{ color: 'var(--grey)', fontSize: 13, lineHeight: 1.7 }}>
+              Téléphones, voitures et chaussures de qualité. Livraison & service WhatsApp.
             </p>
           </div>
 
           {/* Catégories */}
           <div>
             <h4 style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 13, letterSpacing: 3,
-              textTransform: 'uppercase', color: 'var(--red)', marginBottom: 16,
-            }}>Nos catégories</h4>
+              fontFamily: 'var(--font-condensed)', fontSize: 11,
+              letterSpacing: 3, textTransform: 'uppercase',
+              color: 'var(--green)', marginBottom: 14,
+            }}>Catégories</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
                 <li key={key}>
@@ -57,53 +57,47 @@ export default function Footer() {
           {/* Contact */}
           <div>
             <h4 style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 13, letterSpacing: 3,
-              textTransform: 'uppercase', color: 'var(--red)', marginBottom: 16,
+              fontFamily: 'var(--font-condensed)', fontSize: 11,
+              letterSpacing: 3, textTransform: 'uppercase',
+              color: 'var(--green)', marginBottom: 14,
             }}>Contact</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              <div style={{ display: 'flex', gap: 10, color: 'var(--grey-light)', fontSize: 14 }}>
-                <MapPin size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--red)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ display: 'flex', gap: 8, color: 'var(--grey-light)', fontSize: 13 }}>
+                <MapPin size={14} style={{ color: 'var(--green)', marginTop: 2, flexShrink: 0 }} />
                 Dakar, Sénégal
               </div>
-              <div style={{ display: 'flex', gap: 10, color: 'var(--grey-light)', fontSize: 14 }}>
-                <Phone size={16} style={{ flexShrink: 0, marginTop: 2, color: 'var(--red)' }} />
+              <div style={{ display: 'flex', gap: 8, color: 'var(--grey-light)', fontSize: 13 }}>
+                <Phone size={14} style={{ color: 'var(--green)', marginTop: 2, flexShrink: 0 }} />
                 +221 77 101 85 57
               </div>
             </div>
-
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Bonjour CTK&BM ! Je souhaite avoir plus d'informations sur vos produits.")}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Bonjour CTK&BM ! Je souhaite plus d'informations.")}`}
+              target="_blank" rel="noopener noreferrer"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                marginTop: 20, background: '#25D366', color: '#fff',
-                padding: '10px 18px',
-                fontFamily: 'var(--font-condensed)', fontSize: 13, letterSpacing: 2, textTransform: 'uppercase',
-                transition: 'opacity 0.2s',
+                marginTop: 16, background: 'var(--green)', color: '#000',
+                padding: '10px 16px', borderRadius: 8,
+                fontFamily: 'var(--font-condensed)', fontSize: 13,
+                fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
+                transition: 'background 0.2s',
               }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--green-dark)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--green)'}
             >
-              <MessageCircle size={15} />
-              Contacter sur WhatsApp
+              <MessageCircle size={14} /> WhatsApp
             </a>
           </div>
         </div>
 
-        {/* Bottom */}
         <div style={{
-          borderTop: '1px solid var(--border)', paddingTop: 24,
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          flexWrap: 'wrap', gap: 12,
+          borderTop: '1px solid var(--border)', paddingTop: 20,
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', flexWrap: 'wrap', gap: 8,
         }}>
           <p style={{ color: 'var(--grey)', fontSize: 12 }}>
             © {new Date().getFullYear()} CTK&BM — Tous droits réservés
           </p>
-          <Link to="/admin" style={{
-            color: 'var(--border)', fontSize: 11,
-            transition: 'color 0.2s',
-          }}
+          <Link to="/admin" style={{ color: 'var(--border)', fontSize: 11 }}
             onMouseEnter={e => e.target.style.color = 'var(--grey)'}
             onMouseLeave={e => e.target.style.color = 'var(--border)'}
           >
