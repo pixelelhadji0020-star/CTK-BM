@@ -113,16 +113,17 @@ export default function Admin() {
   setEditing(false);
 }
   function handleEdit(product) {
-    setForm({
-      ...product,
-      price: String(product.price),
-      specs: [...product.specs, '', '', '', '', ''].slice(0, 5),
-      badge: product.badge || '',
-    });
-    setEditing(true);
-    setShowForm(true);
-    setActiveCategory(product.category);
-  }
+  setForm({
+    ...product,
+    images: product.images || (product.image ? [product.image] : []),
+    price: String(product.price),
+    specs: [...product.specs, '', '', '', '', ''].slice(0, 5),
+    badge: product.badge || '',
+  });
+  setEditing(true);
+  setShowForm(true);
+  setActiveCategory(product.category);
+}
 
   function handleDelete(id) {
     persist(products.filter(p => p.id !== id));
