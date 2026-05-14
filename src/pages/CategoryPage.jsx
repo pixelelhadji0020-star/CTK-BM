@@ -8,8 +8,7 @@ export default function CategoryPage() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const all = getProducts();
-    setProducts(all.filter(p => p.category === category));
+    setProducts(getProducts().filter(p => p.category === category));
   }, [category]);
 
   if (!CATEGORIES[category]) return <Navigate to="/" replace />;
@@ -17,58 +16,50 @@ export default function CategoryPage() {
   const { label, icon } = CATEGORIES[category];
 
   return (
-    <div style={{ paddingTop: 68 }}>
-      {/* Category Hero */}
+    <div style={{ paddingTop: 60 }}>
+      {/* Hero */}
       <div style={{
         background: 'var(--deep)',
         borderBottom: '1px solid var(--border)',
-        padding: '60px 0 48px',
-        position: 'relative', overflow: 'hidden',
+        padding: '48px 16px 36px',
+        textAlign: 'center',
       }}>
-        <div style={{
-          position: 'absolute', right: -40, top: '50%', transform: 'translateY(-50%)',
-          fontFamily: 'var(--font-display)', fontSize: '18vw',
-          color: 'rgba(255,255,255,0.015)', letterSpacing: -10, userSelect: 'none',
-          lineHeight: 1,
+        <div style={{ fontSize: 40, marginBottom: 8 }}>{icon}</div>
+        <h1 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'clamp(44px, 12vw, 80px)',
+          letterSpacing: 3, lineHeight: 1,
         }}>
           {label.toUpperCase()}
-        </div>
-        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
-          <div style={{
-            fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 4,
-            textTransform: 'uppercase', color: 'var(--red)', marginBottom: 10,
-          }}>
-            {icon} Catalogue
-          </div>
-          <h1 style={{
-            fontFamily: 'var(--font-display)', fontSize: 'clamp(48px, 8vw, 90px)',
-            letterSpacing: 2, lineHeight: 1,
-          }}>
-            {label.toUpperCase()}
-          </h1>
-          <p style={{ color: 'var(--grey)', marginTop: 12, fontFamily: 'var(--font-body)', fontSize: 14 }}>
-            {products.length} produit{products.length !== 1 ? 's' : ''} disponible{products.length !== 1 ? 's' : ''}
-          </p>
-        </div>
+        </h1>
+        <p style={{
+          color: 'var(--grey)', marginTop: 10,
+          fontFamily: 'var(--font-condensed)', fontSize: 14, letterSpacing: 1,
+        }}>
+          {products.length} produit{products.length !== 1 ? 's' : ''} disponible{products.length !== 1 ? 's' : ''}
+        </p>
       </div>
 
       {/* Products */}
-      <div className="container" style={{ padding: '60px 24px' }}>
+      <div className="container" style={{ padding: '40px 16px 60px' }}>
         {products.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '80px 0' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>{icon}</div>
-            <p style={{ color: 'var(--grey)', fontFamily: 'var(--font-condensed)', fontSize: 18, letterSpacing: 2 }}>
-              Aucun produit disponible pour le moment
-            </p>
+          <div style={{
+            textAlign: 'center', padding: '80px 0',
+            color: 'var(--grey)',
+            fontFamily: 'var(--font-condensed)', fontSize: 16, letterSpacing: 2,
+          }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>{icon}</div>
+            Aucun produit disponible
           </div>
         ) : (
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: 28,
+            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+            gap: 20,
           }}>
             {products.map((product, i) => (
-              <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.07}s both` }}>
+              <div key={product.id}
+                style={{ animation: `fadeUp 0.4s ${i * 0.06}s both` }}>
                 <ProductCard product={product} />
               </div>
             ))}
