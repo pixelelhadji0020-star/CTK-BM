@@ -1,12 +1,13 @@
-// Default products data
 export const defaultProducts = [
-  // TÉLÉPHONES
   {
     id: 'ph-1',
     category: 'telephones',
     name: 'Samsung Galaxy S24 Ultra',
     price: 650000,
-    image: 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&q=80',
+      'https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=600&q=80',
+    ],
     specs: ['6.8" QHD+ Dynamic AMOLED', '12 Go RAM / 256 Go', 'Quad caméra 200MP', 'Snapdragon 8 Gen 3', 'Batterie 5000 mAh'],
     badge: 'Nouveau',
   },
@@ -15,7 +16,10 @@ export const defaultProducts = [
     category: 'telephones',
     name: 'iPhone 15 Pro Max',
     price: 750000,
-    image: 'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1591337676887-a217a6970a8a?w=600&q=80',
+      'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=600&q=80',
+    ],
     specs: ['6.7" Super Retina XDR', '8 Go RAM / 256 Go', 'Triple caméra 48MP', 'Puce A17 Pro', 'Titane naturel'],
     badge: 'Top vente',
   },
@@ -24,17 +28,21 @@ export const defaultProducts = [
     category: 'telephones',
     name: 'Tecno Camon 30 Pro',
     price: 185000,
-    image: 'https://images.unsplash.com/photo-1512054502232-10a0a035d672?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=600&q=80',
+    ],
     specs: ['6.77" AMOLED 144Hz', '8 Go RAM / 256 Go', 'Caméra principale 50MP', 'Dimensity 8050', 'Batterie 5000 mAh'],
     badge: null,
   },
-  // VOITURES
   {
     id: 'vt-1',
     category: 'voitures',
     name: 'Toyota Corolla 2022',
     price: 9500000,
-    image: 'https://images.unsplash.com/photo-1623869675781-80aa31012a5a?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1623869675781-80aa31012a5a?w=600&q=80',
+      'https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=600&q=80',
+    ],
     specs: ['Essence 1.8L hybride', 'Automatique CVT', '5 places', 'Kilométrage: 28 000 km', 'Couleur: Blanc nacré'],
     badge: 'Occasion',
   },
@@ -43,7 +51,10 @@ export const defaultProducts = [
     category: 'voitures',
     name: 'Mercedes GLE 400d',
     price: 32000000,
-    image: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&q=80',
+      'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&q=80',
+    ],
     specs: ['Diesel 3.0L 330ch', 'Automatique 9G-TRONIC', '4MATIC AWD', 'Kilométrage: 15 000 km', 'Cuir Nappa'],
     badge: 'Premium',
   },
@@ -52,17 +63,21 @@ export const defaultProducts = [
     category: 'voitures',
     name: 'Renault Duster 2021',
     price: 7800000,
-    image: 'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?w=600&q=80',
+    ],
     specs: ['Essence 1.3L TCe 130ch', 'Manuelle 6 vitesses', '5 places', 'Kilométrage: 42 000 km', 'SUV 4x2'],
     badge: null,
   },
-  // CHAUSSURES
   {
     id: 'ch-1',
     category: 'chaussures',
     name: 'Nike Air Force 1 Low',
     price: 45000,
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80',
+      'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80',
+    ],
     specs: ['Cuir pleine fleur', 'Semelle Air-Sole', 'Pointures: 38–46', 'Coloris: Blanc/Blanc', 'Unisexe'],
     badge: 'Classique',
   },
@@ -71,7 +86,10 @@ export const defaultProducts = [
     category: 'chaussures',
     name: 'Adidas Yeezy Boost 350',
     price: 95000,
-    image: 'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&q=80',
+      'https://images.unsplash.com/photo-1584735175315-9d5df23be4be?w=600&q=80',
+    ],
     specs: ['Primeknit Stretch', 'Semelle Boost', 'Pointures: 38–46', 'Coloris: Zebra', 'Homme / Femme'],
     badge: 'Édition limitée',
   },
@@ -80,7 +98,9 @@ export const defaultProducts = [
     category: 'chaussures',
     name: 'Derby Cuir Premium',
     price: 38000,
-    image: 'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1614252235316-8c857d38b5f4?w=600&q=80',
+    ],
     specs: ['Cuir véritable', 'Semelle Goodyear welt', 'Pointures: 39–45', 'Coloris: Marron cognac', 'Homme'],
     badge: null,
   },
@@ -126,6 +146,6 @@ Merci de me donner plus d'informations. 🙏`;
 
 export const CATEGORIES = {
   telephones: { label: 'Téléphones', icon: '📱' },
-  voitures: { label: 'Voitures', icon: '🚗' },
+  voitures:   { label: 'Voitures',   icon: '🚗' },
   chaussures: { label: 'Chaussures', icon: '👟' },
 };
