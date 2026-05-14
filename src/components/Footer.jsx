@@ -6,10 +6,8 @@ import { CATEGORIES, WHATSAPP_NUMBER } from '../data/products';
 export default function Footer() {
   return (
     <footer style={{
-      background: 'var(--deep)',
-      borderTop: '1px solid var(--border)',
-      padding: '48px 0 24px',
-      marginTop: 60,
+      background: 'var(--deep)', borderTop: '1px solid var(--border)',
+      padding: '48px 0 24px', marginTop: 60,
     }}>
       <div className="container">
         <div style={{
@@ -23,10 +21,15 @@ export default function Footer() {
               fontFamily: 'var(--font-display)', fontSize: 28,
               letterSpacing: 4, marginBottom: 10,
             }}>
-              CTK<span style={{ color: 'var(--green)' }}>&</span>BM
+              CTK
+              <span style={{
+                background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+              }}>&</span>
+              BM
             </div>
             <p style={{ color: 'var(--grey)', fontSize: 13, lineHeight: 1.7 }}>
-              Téléphones, voitures et chaussures de qualité. Livraison & service WhatsApp.
+              Téléphones, voitures et chaussures de qualité. Commandez directement sur WhatsApp.
             </p>
           </div>
 
@@ -35,16 +38,15 @@ export default function Footer() {
             <h4 style={{
               fontFamily: 'var(--font-condensed)', fontSize: 11,
               letterSpacing: 3, textTransform: 'uppercase',
-              color: 'var(--green)', marginBottom: 14,
+              color: 'var(--gold)', marginBottom: 14,
             }}>Catégories</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 10 }}>
               {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
                 <li key={key}>
                   <Link to={`/categorie/${key}`} style={{
-                    color: 'var(--grey-light)', fontSize: 14,
-                    transition: 'color 0.2s',
+                    color: 'var(--grey-light)', fontSize: 14, transition: 'color 0.2s',
                   }}
-                    onMouseEnter={e => e.target.style.color = 'var(--white)'}
+                    onMouseEnter={e => e.target.style.color = 'var(--off-white)'}
                     onMouseLeave={e => e.target.style.color = 'var(--grey-light)'}
                   >
                     {icon} {label}
@@ -59,15 +61,15 @@ export default function Footer() {
             <h4 style={{
               fontFamily: 'var(--font-condensed)', fontSize: 11,
               letterSpacing: 3, textTransform: 'uppercase',
-              color: 'var(--green)', marginBottom: 14,
+              color: 'var(--gold)', marginBottom: 14,
             }}>Contact</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', gap: 8, color: 'var(--grey-light)', fontSize: 13 }}>
-                <MapPin size={14} style={{ color: 'var(--green)', marginTop: 2, flexShrink: 0 }} />
+                <MapPin size={14} style={{ color: 'var(--gold)', marginTop: 2, flexShrink: 0 }} />
                 Dakar, Sénégal
               </div>
               <div style={{ display: 'flex', gap: 8, color: 'var(--grey-light)', fontSize: 13 }}>
-                <Phone size={14} style={{ color: 'var(--green)', marginTop: 2, flexShrink: 0 }} />
+                <Phone size={14} style={{ color: 'var(--gold)', marginTop: 2, flexShrink: 0 }} />
                 +221 77 101 85 57
               </div>
             </div>
@@ -75,14 +77,15 @@ export default function Footer() {
               target="_blank" rel="noopener noreferrer"
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
-                marginTop: 16, background: 'var(--green)', color: '#000',
-                padding: '10px 16px', borderRadius: 8,
+                marginTop: 16,
+                background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
+                color: '#000', padding: '10px 16px', borderRadius: 8,
                 fontFamily: 'var(--font-condensed)', fontSize: 13,
                 fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
-                transition: 'background 0.2s',
+                transition: 'opacity 0.2s',
               }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--green-dark)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'var(--green)'}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >
               <MessageCircle size={14} /> WhatsApp
             </a>
