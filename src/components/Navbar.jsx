@@ -9,7 +9,7 @@ export default function Navbar() {
   const location = useLocation();
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 40);
+    const handler = () => setScrolled(window.scrollY > 30);
     window.addEventListener('scroll', handler);
     return () => window.removeEventListener('scroll', handler);
   }, []);
@@ -17,74 +17,96 @@ export default function Navbar() {
   useEffect(() => setOpen(false), [location]);
 
   return (
-    <header style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      background: scrolled ? 'rgba(6,6,6,0.97)' : 'transparent',
-      borderBottom: scrolled ? '1px solid var(--border)' : 'none',
-      backdropFilter: scrolled ? 'blur(12px)' : 'none',
-      transition: 'all 0.3s ease',
-    }}>
-      <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 68 }}>
-        {/* Logo */}
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 40, height: 40, background: 'var(--red)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-display)', fontSize: 18, letterSpacing: 1, color: '#fff',
-            clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)',
-          }}>CTK</div>
-          <span style={{ fontFamily: 'var(--font-display)', fontSize: 22, letterSpacing: 3, color: 'var(--white)' }}>
-            CTK<span style={{ color: 'var(--red)' }}>&</span>BM
-          </span>
-        </Link>
-
-        {/* Desktop nav */}
-        <nav style={{ display: 'flex', gap: 32, alignItems: 'center' }} className="desktop-nav">
-          {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
-            <Link key={key} to={`/categorie/${key}`} style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 15, letterSpacing: 2, textTransform: 'uppercase',
-              color: location.pathname === `/categorie/${key}` ? 'var(--red)' : 'var(--grey-light)',
-              transition: 'color 0.2s',
-            }}
-              onMouseEnter={e => e.target.style.color = 'var(--white)'}
-              onMouseLeave={e => e.target.style.color = location.pathname === `/categorie/${key}` ? 'var(--red)' : 'var(--grey-light)'}
-            >
-              {icon} {label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Hamburger */}
-        <button onClick={() => setOpen(!open)} style={{ color: 'var(--white)', display: 'none' }} className="hamburger">
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile menu */}
-      {open && (
-        <div style={{
-          background: 'var(--deep)', borderTop: '1px solid var(--border)',
-          padding: '24px',
-          animation: 'fadeIn 0.2s ease',
+    <>
+      <header style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        background: scrolled ? 'rgba(5,5,5,0.96)' : 'rgba(5,5,5,0.7)',
+        borderBottom: '1px solid var(--border)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        transition: 'background 0.3s',
+      }}>
+        <div className="container" style={{
+          display: 'flex', alignItems: 'center',
+          justifyContent: 'space-between', height: 60,
         }}>
-          {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
-            <Link key={key} to={`/categorie/${key}`} style={{
-              display: 'block', padding: '14px 0',
-              fontFamily: 'var(--font-condensed)', fontSize: 20, letterSpacing: 2, textTransform: 'uppercase',
-              color: location.pathname === `/categorie/${key}` ? 'var(--red)' : 'var(--grey-light)',
-              borderBottom: '1px solid var(--border)',
+          {/* Logo */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{
+              width: 34, height: 34,
+              background: 'var(--green)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'var(--font-display)', fontSize: 14, color: '#000',
+              letterSpacing: 1,
+              borderRadius: 4,
+            }}>CTK</div>
+            <span style={{
+              fontFamily: 'var(--font-display)', fontSize: 20,
+              letterSpacing: 3, color: 'var(--white)',
             }}>
-              {icon} {label}
-            </Link>
-          ))}
+              CTK<span style={{ color: 'var(--green)' }}>&</span>BM
+            </span>
+          </Link>
+
+          {/* Desktop nav */}
+          <nav style={{ display: 'flex', gap: 28, alignItems: 'center' }}
+            className="desktop-nav">
+            {Object.entries(CATEGORIES).map(([key, { label, icon }]) => {
+              const active = location.pathname === `/categorie/${key}`;
+              return (
+                <Link key={key} to={`/categorie/${key}`} style={{
+                  fontFamily: 'var(--font-condensed)', fontSize: 14,
+                  letterSpacing: 2, textTransform: 'uppercase',
+                  color: active ? 'var(--green)' : 'var(--grey-light)',
+                  borderBottom: active ? '1px solid var(--green)' : '1px solid transparent',
+                  paddingBottom: 2,
+                  transition: 'color 0.2s',
+                }}>
+                  {icon} {label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Hamburger */}
+          <button onClick={() => setOpen(!open)}
+            style={{ color: 'var(--white)', display: 'none', padding: 4 }}
+            className="hamburger">
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
-      )}
+
+        {/* Mobile menu */}
+        {open && (
+          <div style={{
+            background: 'var(--deep)',
+            borderTop: '1px solid var(--border)',
+            padding: '8px 0 16px',
+            animation: 'fadeIn 0.15s ease',
+          }}>
+            {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
+              <Link key={key} to={`/categorie/${key}`} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                padding: '14px 20px',
+                fontFamily: 'var(--font-condensed)', fontSize: 18,
+                letterSpacing: 2, textTransform: 'uppercase',
+                color: location.pathname === `/categorie/${key}`
+                  ? 'var(--green)' : 'var(--off-white)',
+                borderBottom: '1px solid var(--border)',
+              }}>
+                <span style={{ fontSize: 20 }}>{icon}</span> {label}
+              </Link>
+            ))}
+          </div>
+        )}
+      </header>
 
       <style>{`
-        @media (max-width: 768px) {
+        @media (max-width: 700px) {
           .desktop-nav { display: none !important; }
-          .hamburger { display: block !important; }
+          .hamburger { display: flex !important; }
         }
       `}</style>
-    </header>
+    </>
   );
 }
