@@ -496,7 +496,7 @@ export default function Admin() {
                 {/* Bouton principal galerie */}
                 <input
                   ref={fileInputRef} type="file"
-                  accept="image/*" capture="environment"
+                  accept="image/*"
                   onChange={handleImagePick}
                   style={{ display: 'none' }}
                 />
