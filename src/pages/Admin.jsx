@@ -79,19 +79,21 @@ export default function Admin() {
 
   // Upload depuis la galerie
   async function handleImagePick(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageLoading(true);
-    try {
-      const base64 = await fileToBase64(file);
-      setForm(f => ({ ...f, image: base64 }));
-    } catch {
-      alert("Erreur lors du chargement de l'image.");
-    }
-    setImageLoading(false);
-    // reset input pour permettre re-sélection du même fichier
-    e.target.value = '';
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  setImageLoading(true);
+  try {
+    const newBase64s = await Promise.all(files.map(fileToBase64));
+    setForm(f => ({
+      ...f,
+      images: [...(f.images || []), ...newBase64s].slice(0, 4),
+    }));
+  } catch {
+    alert("Erreur lors du chargement des images.");
   }
+  setImageLoading(false);
+  e.target.value = '';
+}
 
   function handleSubmit() {
     if (!form.name || !form.price || !form.image) return;
