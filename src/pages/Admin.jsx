@@ -342,7 +342,7 @@ export default function Admin() {
               onMouseEnter={e => e.currentTarget.style.borderColor = 'rgba(201,168,76,0.3)'}
               onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border)'}
             >
-              <img src={product.image} alt={product.name} style={{
+              <img src={product.images?.[0]} alt={product.name} style={{
                 width: 58, height: 58, objectFit: 'cover',
                 borderRadius: 8, flexShrink: 0,
                 border: '1px solid var(--border)',
@@ -649,10 +649,10 @@ export default function Admin() {
               <div style={{ display: 'flex', gap: 10, paddingBottom: 8 }}>
                 <button onClick={handleSubmit}
                   disabled={!form.name || !form.price || !form.images?.length}
-// et
-color: (!form.name || !form.price || !form.images?.length) ? 'var(--grey)' : '#000',
-background: (!form.name || !form.price || !form.images?.length) ? 'var(--border)' : 'linear-gradient(...)',
-cursor: (!form.name || !form.price || !form.images?.length) ? 'not-allowed' : 'pointer',
+                  // et
+                 {{ color: (!form.name || !form.price || !form.images?.length) ? 'var(--grey)' : '#000',
+                  background: (!form.name || !form.price || !form.images?.length) ? 'var(--border)' : 'linear-gradient(...)',
+                  cursor: (!form.name || !form.price || !form.images?.length) ? 'not-allowed' : 'pointer',
                   }}
                 >
                   <Check size={16} />
