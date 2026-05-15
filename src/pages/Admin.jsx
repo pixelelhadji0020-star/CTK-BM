@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getProducts, saveProducts, defaultProducts, CATEGORIES, formatPrice } from '../data/products';
+import { getProducts, addProduct, updateProduct, deleteProduct, defaultProducts, CATEGORIES, formatPrice } from '../data/products';
+import { uploadImage, deleteImage } from '../lib/supabase';
 import { Plus, Pencil, Trash2, X, Check, Lock, LogOut, Package, RefreshCw, ImagePlus } from 'lucide-react';
 
 const ADMIN_PASSWORD = 'ctkbm2024';
