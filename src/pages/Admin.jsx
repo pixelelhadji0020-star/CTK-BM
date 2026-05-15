@@ -7,10 +7,9 @@ const ADMIN_PASSWORD = 'ctkbm2024';
 
 const emptyForm = {
   id: '', category: 'telephones', name: '',
-  price: '', images: [], specs: ['', '', '', '', ''], badge: '',
+  price: '', images: [], _pendingFiles: [], specs: ['', '', '', '', ''], badge: '',
 };
 
-// Convertit un fichier image en base64
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -58,14 +57,12 @@ export default function Admin() {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    if (authenticated) setProducts(getProducts());
+    if (authenticated) reload();
   }, [authenticated]);
 
-  function persist(updated) {
-    saveProducts(updated);
-    setProducts(updated);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  async function reload() {
+    const data = await getProducts();
+    setProducts(data);
   }
 
   function handleLogin() {
@@ -78,62 +75,121 @@ export default function Admin() {
     }
   }
 
-  // Upload depuis la galerie
   async function handleImagePick(e) {
-  const files = Array.from(e.target.files || []);
-  if (!files.length) return;
-  setImageLoading(true);
-  try {
-    const newBase64s = await Promise.all(files.map(fileToBase64));
-    setForm(f => ({
-      ...f,
-      images: [...(f.images || []), ...newBase64s].slice(0, 4),
-    }));
-  } catch {
-    alert("Erreur lors du chargement des images.");
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const currentTotal = (form.images?.length || 0) + (form._pendingFiles?.length || 0);
+    if (currentTotal >= 4) return;
+    setImageLoading(true);
+    try {
+      const allowed = files.slice(0, 4 - currentTotal);
+      const previews = await Promise.all(allowed.map(fileToBase64));
+      const entries = allowed.map((file, i) => ({ preview: previews[i], file }));
+      setForm(f => ({
+        ...f,
+        _pendingFiles: [...(f._pendingFiles || []), ...entries],
+      }));
+    } catch {
+      alert("Erreur lors du chargement des images.");
+    }
+    setImageLoading(false);
+    e.target.value = '';
   }
-  setImageLoading(false);
-  e.target.value = '';
-}
 
-  function handleSubmit() {
-  if (!form.name || !form.price || !form.images?.length) return;
-  const product = {
-    ...form,
-    price: Number(form.price),
-    specs: form.specs.filter(s => s.trim()),
-    badge: form.badge.trim() || null,
-    id: editing ? form.id : `${form.category}-${Date.now()}`,
-  };
-  const updated = editing
-    ? products.map(p => p.id === product.id ? product : p)
-    : [...products, product];
-  persist(updated);
-  setShowForm(false);
-  setForm(emptyForm);
-  setEditing(false);
-}
+  async function handleSubmit() {
+    const totalImages = (form.images?.length || 0) + (form._pendingFiles?.length || 0);
+    if (!form.name || !form.price || totalImages === 0) return;
+
+    setImageLoading(true);
+    try {
+      let newUrls = [];
+      if (form._pendingFiles?.length) {
+        newUrls = await Promise.all(
+          form._pendingFiles.map(({ file, preview }) =>
+            uploadImage(file || preview, file?.name || 'photo')
+          )
+        );
+      }
+
+      const allImages = [...(form.images || []), ...newUrls];
+
+      const product = {
+        id: editing ? form.id : `${form.category}-${Date.now()}`,
+        category: form.category,
+        name: form.name,
+        price: Number(form.price),
+        images: allImages,
+        specs: form.specs.filter(s => s.trim()),
+        badge: form.badge.trim() || null,
+      };
+
+      if (editing) {
+        await updateProduct(product);
+      } else {
+        await addProduct(product);
+      }
+
+      await reload();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+      setShowForm(false);
+      setForm(emptyForm);
+      setEditing(false);
+    } catch (e) {
+      alert('Erreur upload ou sauvegarde : ' + e.message);
+    }
+    setImageLoading(false);
+  }
+
   function handleEdit(product) {
-  setForm({
-    ...product,
-    images: product.images || (product.image ? [product.image] : []),
-    price: String(product.price),
-    specs: [...product.specs, '', '', '', '', ''].slice(0, 5),
-    badge: product.badge || '',
-  });
-  setEditing(true);
-  setShowForm(true);
-  setActiveCategory(product.category);
-}
+    setForm({
+      ...product,
+      images: product.images || (product.image ? [product.image] : []),
+      _pendingFiles: [],
+      price: String(product.price),
+      specs: [...product.specs, '', '', '', '', ''].slice(0, 5),
+      badge: product.badge || '',
+    });
+    setEditing(true);
+    setShowForm(true);
+    setActiveCategory(product.category);
+  }
 
-  function handleDelete(id) {
-    persist(products.filter(p => p.id !== id));
+  async function handleDelete(id) {
+    try {
+      const product = products.find(p => p.id === id);
+      if (product?.images?.length) {
+        await Promise.all(product.images.map(deleteImage));
+      }
+      await deleteProduct(id);
+      await reload();
+    } catch (e) {
+      alert('Erreur : ' + e.message);
+    }
     setDeleteConfirm(null);
   }
 
-  const filtered = products.filter(p => p.category === activeCategory);
+  async function handleReset() {
+    if (!confirm('Réinitialiser tous les produits ? Les images uploadées seront supprimées.')) return;
+    try {
+      for (const p of products) {
+        if (p.images?.length) await Promise.all(p.images.map(deleteImage));
+        await deleteProduct(p.id);
+      }
+      for (const p of defaultProducts) await addProduct(p);
+      await reload();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (e) {
+      alert('Erreur : ' + e.message);
+    }
+  }
 
-  // ── LOGIN SCREEN ──────────────────────────────────────────────
+  const filtered = products.filter(p => p.category === activeCategory);
+  const totalPending = (form.images?.length || 0) + (form._pendingFiles?.length || 0);
+  const canSubmit = form.name && form.price && totalPending > 0;
+
+  // ── LOGIN ─────────────────────────────────────────────────────
   if (!authenticated) {
     return (
       <div style={{
@@ -162,7 +218,6 @@ export default function Admin() {
             </h1>
             <p style={{ color: 'var(--grey)', fontSize: 13, marginTop: 4 }}>CTK&BM</p>
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             <GoldInput label="Mot de passe" value={passwordInput}
               onChange={setPasswordInput} type="password" placeholder="••••••••" />
@@ -171,7 +226,8 @@ export default function Admin() {
                 Mot de passe incorrect
               </p>
             )}
-            <button onClick={handleLogin}
+            <button
+              onClick={handleLogin}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
               style={{
                 background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
@@ -180,8 +236,8 @@ export default function Admin() {
                 fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
                 transition: 'opacity 0.2s',
               }}
-              onMouseEnter={e => e.target.style.opacity = '0.85'}
-              onMouseLeave={e => e.target.style.opacity = '1'}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
             >
               Connexion
             </button>
@@ -191,7 +247,7 @@ export default function Admin() {
     );
   }
 
-  // ── ADMIN DASHBOARD ───────────────────────────────────────────
+  // ── DASHBOARD ─────────────────────────────────────────────────
   return (
     <div style={{ minHeight: '100vh', background: 'var(--black)' }}>
 
@@ -200,16 +256,19 @@ export default function Admin() {
         background: 'var(--deep)', borderBottom: '1px solid var(--border)',
         padding: '14px 16px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        position: 'sticky', top: 0, zIndex: 50,
-        flexWrap: 'wrap', gap: 10,
+        position: 'sticky', top: 0, zIndex: 50, flexWrap: 'wrap', gap: 10,
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontFamily: 'var(--font-display)', fontSize: 20, letterSpacing: 3 }}>
-            CTK<span style={{
+            CTK
+            <span style={{
               background: 'linear-gradient(90deg,var(--gold),var(--gold-light))',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>&</span>BM
-            <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 3, color: 'var(--grey)', marginLeft: 8 }}>ADMIN</span>
+            }}>&</span>
+            BM
+            <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 3, color: 'var(--grey)', marginLeft: 8 }}>
+              ADMIN
+            </span>
           </span>
           {saved && (
             <div style={{
@@ -224,7 +283,7 @@ export default function Admin() {
           )}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={() => persist(defaultProducts)} style={{
+          <button onClick={handleReset} style={{
             display: 'flex', alignItems: 'center', gap: 5,
             border: '1px solid var(--border)', color: 'var(--grey)',
             padding: '7px 12px', borderRadius: 6,
@@ -257,11 +316,10 @@ export default function Admin() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12, marginBottom: 28 }}>
           {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
             <div key={key} onClick={() => setActiveCategory(key)} style={{
-              background: 'var(--card)',
+              background: activeCategory === key ? 'rgba(201,168,76,0.05)' : 'var(--card)',
               border: `1px solid ${activeCategory === key ? 'var(--gold)' : 'var(--border)'}`,
               borderRadius: 10, padding: '16px',
-              cursor: 'pointer', transition: 'border-color 0.2s',
-              background: activeCategory === key ? 'rgba(201,168,76,0.05)' : 'var(--card)',
+              cursor: 'pointer', transition: 'all 0.2s',
             }}>
               <div style={{ fontSize: 22, marginBottom: 4 }}>{icon}</div>
               <div style={{
@@ -270,10 +328,7 @@ export default function Admin() {
               }}>
                 {products.filter(p => p.category === key).length}
               </div>
-              <div style={{
-                fontFamily: 'var(--font-condensed)', fontSize: 10,
-                letterSpacing: 2, color: 'var(--grey)', textTransform: 'uppercase',
-              }}>
+              <div style={{ fontFamily: 'var(--font-condensed)', fontSize: 10, letterSpacing: 2, color: 'var(--grey)', textTransform: 'uppercase' }}>
                 {label}
               </div>
             </div>
@@ -281,20 +336,14 @@ export default function Admin() {
         </div>
 
         {/* Tabs + Add */}
-        <div style={{
-          display: 'flex', justifyContent: 'space-between',
-          alignItems: 'center', marginBottom: 20,
-          flexWrap: 'wrap', gap: 10,
-        }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, flexWrap: 'wrap', gap: 10 }}>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
             {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
               <button key={key} onClick={() => setActiveCategory(key)} style={{
                 padding: '8px 16px', borderRadius: 8,
                 fontFamily: 'var(--font-condensed)', fontSize: 13,
                 letterSpacing: 1.5, textTransform: 'uppercase',
-                background: activeCategory === key
-                  ? 'linear-gradient(90deg, var(--gold), var(--gold-light))'
-                  : 'transparent',
+                background: activeCategory === key ? 'linear-gradient(90deg, var(--gold), var(--gold-light))' : 'transparent',
                 color: activeCategory === key ? '#000' : 'var(--grey)',
                 border: `1px solid ${activeCategory === key ? 'transparent' : 'var(--border)'}`,
                 transition: 'all 0.2s',
@@ -305,7 +354,8 @@ export default function Admin() {
           </div>
           <button onClick={() => {
             setForm({ ...emptyForm, category: activeCategory });
-            setEditing(false); setShowForm(true);
+            setEditing(false);
+            setShowForm(true);
           }} style={{
             display: 'flex', alignItems: 'center', gap: 7,
             background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
@@ -327,10 +377,9 @@ export default function Admin() {
             <div style={{
               textAlign: 'center', padding: '60px 0',
               border: '2px dashed var(--border)', borderRadius: 12,
-              color: 'var(--grey)',
-              fontFamily: 'var(--font-condensed)', fontSize: 14, letterSpacing: 2,
+              color: 'var(--grey)', fontFamily: 'var(--font-condensed)', fontSize: 14, letterSpacing: 2,
             }}>
-              <Package size={28} style={{ margin: '0 auto 10px', opacity: 0.3 }} />
+              <Package size={28} style={{ margin: '0 auto 10px', opacity: 0.3, display: 'block' }} />
               Aucun produit — Cliquez sur « Ajouter »
             </div>
           ) : filtered.map(product => (
@@ -345,21 +394,16 @@ export default function Admin() {
             >
               <img src={product.images?.[0]} alt={product.name} style={{
                 width: 58, height: 58, objectFit: 'cover',
-                borderRadius: 8, flexShrink: 0,
-                border: '1px solid var(--border)',
+                borderRadius: 8, flexShrink: 0, border: '1px solid var(--border)',
               }} />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 15, fontWeight: 700,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-                }}>
+                <div style={{ fontFamily: 'var(--font-condensed)', fontSize: 15, fontWeight: 700, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {product.name}
                   {product.badge && (
                     <span style={{
                       marginLeft: 8, background: 'var(--gold)', color: '#000',
                       fontSize: 9, letterSpacing: 1.5, textTransform: 'uppercase',
-                      padding: '2px 6px', borderRadius: 3,
-                      fontFamily: 'var(--font-condensed)',
+                      padding: '2px 6px', borderRadius: 3, fontFamily: 'var(--font-condensed)',
                     }}>
                       {product.badge}
                     </span>
@@ -368,13 +412,12 @@ export default function Admin() {
                 <div style={{
                   fontFamily: 'var(--font-display)', fontSize: 17,
                   background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                  marginTop: 2,
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginTop: 2,
                 }}>
                   {formatPrice(product.price)}
                 </div>
                 <div style={{ color: 'var(--grey)', fontSize: 11, marginTop: 2 }}>
-                  {product.specs.slice(0, 2).join(' · ')}
+                  {product.specs?.slice(0, 2).join(' · ')}
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
@@ -394,14 +437,12 @@ export default function Admin() {
                   <div style={{ display: 'flex', gap: 6 }}>
                     <button onClick={() => handleDelete(product.id)} style={{
                       background: '#e05252', color: '#fff', padding: '7px 12px',
-                      borderRadius: 6, fontSize: 11,
-                      fontFamily: 'var(--font-condensed)', letterSpacing: 1,
+                      borderRadius: 6, fontSize: 11, fontFamily: 'var(--font-condensed)', letterSpacing: 1,
                     }}>
                       Confirmer
                     </button>
                     <button onClick={() => setDeleteConfirm(null)} style={{
-                      border: '1px solid var(--border)', color: 'var(--grey)',
-                      padding: '7px 10px', borderRadius: 6,
+                      border: '1px solid var(--border)', color: 'var(--grey)', padding: '7px 10px', borderRadius: 6,
                     }}>
                       <X size={12} />
                     </button>
@@ -429,11 +470,10 @@ export default function Admin() {
           position: 'fixed', inset: 0, zIndex: 200,
           background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(8px)',
           display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
-          padding: 0, animation: 'fadeIn 0.2s ease',
+          animation: 'fadeIn 0.2s ease',
         }}
           onClick={e => e.target === e.currentTarget && setShowForm(false)}
         >
-          {/* Bottom sheet sur mobile, centré sur desktop */}
           <div style={{
             background: 'var(--deep)', borderTop: '1px solid var(--border)',
             borderRadius: '16px 16px 0 0',
@@ -462,12 +502,12 @@ export default function Admin() {
             </div>
 
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+
               {/* Catégorie */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <label style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 11,
-                  letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-                }}>Catégorie</label>
+                <label style={{ fontFamily: 'var(--font-condensed)', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)' }}>
+                  Catégorie
+                </label>
                 <select value={form.category}
                   onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                   style={{
@@ -489,142 +529,152 @@ export default function Admin() {
                 onChange={v => setForm(f => ({ ...f, price: v }))}
                 type="number" placeholder="Ex: 650000" />
 
-              {/* IMAGE */}
-<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-  <label style={{
-    fontFamily: 'var(--font-condensed)', fontSize: 11,
-    letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-  }}>
-    Photos * (max 4) — {form.images?.length || 0}/4
-  </label>
+              {/* IMAGES */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <label style={{ fontFamily: 'var(--font-condensed)', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)' }}>
+                  Photos * (max 4) — {totalPending}/4
+                </label>
 
-  {/* Bouton galerie — multiple */}
-  <input
-    ref={fileInputRef} type="file"
-    accept="image/*" multiple
-    onChange={handleImagePick}
-    style={{ display: 'none' }}
-  />
+                <input ref={fileInputRef} type="file" accept="image/*" multiple
+                  onChange={handleImagePick} style={{ display: 'none' }} />
 
-  {/* Prévisualisations */}
-  {form.images?.length > 0 && (
-    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
-      {form.images.map((src, i) => (
-        <div key={i} style={{ position: 'relative', flexShrink: 0 }}>
-          <img src={src} alt={`photo ${i + 1}`} style={{
-            width: 80, height: 80, objectFit: 'cover',
-            borderRadius: 8,
-            border: i === 0 ? '2px solid var(--gold)' : '1px solid var(--border)',
-          }} />
-          {/* Supprimer */}
-          <button onClick={() => setForm(f => ({
-            ...f, images: f.images.filter((_, idx) => idx !== i),
-          }))} style={{
-            position: 'absolute', top: -6, right: -6,
-            background: '#e05252', color: '#fff',
-            borderRadius: '50%', width: 20, height: 20,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 10,
-          }}>
-            <X size={11} />
-          </button>
-          {/* Badge "principale" */}
-          {i === 0 && (
-            <div style={{
-              position: 'absolute', bottom: 4, left: 4,
-              background: 'var(--gold)', color: '#000',
-              fontSize: 8, fontFamily: 'var(--font-condensed)',
-              letterSpacing: 1, padding: '1px 5px', borderRadius: 3,
-            }}>
-              PRINCIPALE
-            </div>
-          )}
-        </div>
-      ))}
+                {/* Aperçus */}
+                {totalPending > 0 && (
+                  <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
 
-      {/* Ajouter une photo supplémentaire */}
-      {form.images.length < 4 && (
-        <button onClick={() => fileInputRef.current?.click()} style={{
-          width: 80, height: 80, flexShrink: 0,
-          border: '2px dashed rgba(201,168,76,0.35)',
-          borderRadius: 8, color: 'var(--gold)',
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'center',
-          fontSize: 10, gap: 4,
-          fontFamily: 'var(--font-condensed)', letterSpacing: 1,
-          background: 'rgba(201,168,76,0.04)',
-        }}>
-          <ImagePlus size={18} />
-          Ajouter
-        </button>
-      )}
-    </div>
-  )}
+                    {/* URLs Supabase déjà enregistrées */}
+                    {form.images?.map((src, i) => (
+                      <div key={`saved-${i}`} style={{ position: 'relative', flexShrink: 0 }}>
+                        <img src={src} alt="" style={{
+                          width: 80, height: 80, objectFit: 'cover', borderRadius: 8,
+                          border: i === 0 && !form._pendingFiles?.length ? '2px solid var(--gold)' : '1px solid var(--border)',
+                        }} />
+                        <button onClick={() => setForm(f => ({ ...f, images: f.images.filter((_, idx) => idx !== i) }))} style={{
+                          position: 'absolute', top: -6, right: -6,
+                          background: '#e05252', color: '#fff', borderRadius: '50%',
+                          width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <X size={11} />
+                        </button>
+                        {i === 0 && (
+                          <div style={{
+                            position: 'absolute', bottom: 4, left: 4,
+                            background: 'var(--gold)', color: '#000',
+                            fontSize: 8, fontFamily: 'var(--font-condensed)',
+                            letterSpacing: 1, padding: '1px 5px', borderRadius: 3,
+                          }}>PRINCIPALE</div>
+                        )}
+                      </div>
+                    ))}
 
-  {/* Bouton principal si aucune image */}
-  {(!form.images || form.images.length === 0) && (
-    <button onClick={() => fileInputRef.current?.click()} style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-      background: imageLoading ? 'rgba(201,168,76,0.06)' : 'rgba(201,168,76,0.08)',
-      border: '2px dashed rgba(201,168,76,0.4)',
-      color: imageLoading ? 'var(--grey)' : 'var(--gold-light)',
-      padding: '20px', borderRadius: 10,
-      fontFamily: 'var(--font-condensed)', fontSize: 15,
-      letterSpacing: 1.5, textTransform: 'uppercase',
-      width: '100%', minHeight: 60,
-    }}>
-      <ImagePlus size={20} />
-      {imageLoading ? 'Chargement...' : 'Choisir depuis la galerie'}
-    </button>
-  )}
+                    {/* Fichiers locaux en attente d'upload */}
+                    {form._pendingFiles?.map((entry, i) => (
+                      <div key={`pending-${i}`} style={{ position: 'relative', flexShrink: 0 }}>
+                        <img src={entry.preview} alt="" style={{
+                          width: 80, height: 80, objectFit: 'cover', borderRadius: 8,
+                          border: '1px solid rgba(201,168,76,0.5)', opacity: 0.85,
+                        }} />
+                        <div style={{
+                          position: 'absolute', inset: 0, borderRadius: 8,
+                          background: 'rgba(0,0,0,0.3)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <span style={{
+                            fontSize: 9, color: 'var(--gold-light)',
+                            fontFamily: 'var(--font-condensed)', letterSpacing: 1,
+                            background: 'rgba(0,0,0,0.6)', padding: '2px 5px', borderRadius: 3,
+                          }}>LOCAL</span>
+                        </div>
+                        <button onClick={() => setForm(f => ({ ...f, _pendingFiles: f._pendingFiles.filter((_, idx) => idx !== i) }))} style={{
+                          position: 'absolute', top: -6, right: -6,
+                          background: '#e05252', color: '#fff', borderRadius: '50%',
+                          width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <X size={11} />
+                        </button>
+                      </div>
+                    ))}
 
-  {/* Séparateur OU + URL */}
-  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-    <span style={{ color: 'var(--grey)', fontSize: 11, fontFamily: 'var(--font-condensed)', letterSpacing: 2 }}>OU URL</span>
-    <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
-  </div>
-  <div style={{ display: 'flex', gap: 8 }}>
-    <input type="text" id="urlInput" placeholder="Coller un lien URL..."
-      style={{
-        flex: 1, background: 'var(--black)', border: '1px solid var(--border)',
-        color: 'var(--white)', padding: '10px 14px', fontSize: 13,
-        borderRadius: 6, outline: 'none',
-      }}
-      onFocus={e => e.target.style.borderColor = 'var(--gold)'}
-      onBlur={e => e.target.style.borderColor = 'var(--border)'}
-      onKeyDown={e => {
-        if (e.key === 'Enter' && e.target.value.trim() && (form.images?.length || 0) < 4) {
-          setForm(f => ({ ...f, images: [...(f.images || []), e.target.value.trim()] }));
-          e.target.value = '';
-        }
-      }}
-    />
-    <button onClick={() => {
-      const input = document.getElementById('urlInput');
-      if (input?.value.trim() && (form.images?.length || 0) < 4) {
-        setForm(f => ({ ...f, images: [...(f.images || []), input.value.trim()] }));
-        input.value = '';
-      }
-    }} style={{
-      background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)',
-      color: 'var(--gold)', padding: '10px 14px', borderRadius: 6,
-      fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 1,
-    }}>
-      + Ajouter
-    </button>
-  </div>
-</div>
+                    {/* Bouton + ajouter */}
+                    {totalPending < 4 && (
+                      <button onClick={() => fileInputRef.current?.click()} style={{
+                        width: 80, height: 80, flexShrink: 0,
+                        border: '2px dashed rgba(201,168,76,0.35)', borderRadius: 8,
+                        color: 'var(--gold)',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, gap: 4,
+                        fontFamily: 'var(--font-condensed)', letterSpacing: 1,
+                        background: 'rgba(201,168,76,0.04)',
+                      }}>
+                        <ImagePlus size={18} /> Ajouter
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Bouton principal si aucune image */}
+                {totalPending === 0 && (
+                  <button onClick={() => fileInputRef.current?.click()} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                    background: 'rgba(201,168,76,0.08)',
+                    border: '2px dashed rgba(201,168,76,0.4)',
+                    color: imageLoading ? 'var(--grey)' : 'var(--gold-light)',
+                    padding: '20px', borderRadius: 10,
+                    fontFamily: 'var(--font-condensed)', fontSize: 15,
+                    letterSpacing: 1.5, textTransform: 'uppercase',
+                    width: '100%', minHeight: 60,
+                  }}>
+                    <ImagePlus size={20} />
+                    {imageLoading ? 'Chargement...' : 'Choisir depuis la galerie'}
+                  </button>
+                )}
+
+                {/* OU URL */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                  <span style={{ color: 'var(--grey)', fontSize: 11, fontFamily: 'var(--font-condensed)', letterSpacing: 2 }}>OU URL</span>
+                  <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input type="text" id="urlInput" placeholder="Coller un lien URL..."
+                    style={{
+                      flex: 1, background: 'var(--black)', border: '1px solid var(--border)',
+                      color: 'var(--white)', padding: '10px 14px', fontSize: 13,
+                      borderRadius: 6, outline: 'none',
+                    }}
+                    onFocus={e => e.target.style.borderColor = 'var(--gold)'}
+                    onBlur={e => e.target.style.borderColor = 'var(--border)'}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && e.target.value.trim() && totalPending < 4) {
+                        setForm(f => ({ ...f, images: [...(f.images || []), e.target.value.trim()] }));
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <button onClick={() => {
+                    const input = document.getElementById('urlInput');
+                    if (input?.value.trim() && totalPending < 4) {
+                      setForm(f => ({ ...f, images: [...(f.images || []), input.value.trim()] }));
+                      input.value = '';
+                    }
+                  }} style={{
+                    background: 'rgba(201,168,76,0.12)', border: '1px solid rgba(201,168,76,0.3)',
+                    color: 'var(--gold)', padding: '10px 14px', borderRadius: 6,
+                    fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 1,
+                  }}>
+                    + Ajouter
+                  </button>
+                </div>
+              </div>
+
               <GoldInput label="Badge (optionnel)" value={form.badge}
                 onChange={v => setForm(f => ({ ...f, badge: v }))}
                 placeholder="Ex: Nouveau, Premium..." />
 
               {/* Specs */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <label style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 11,
-                  letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-                }}>
+                <label style={{ fontFamily: 'var(--font-condensed)', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)' }}>
                   Caractéristiques (jusqu'à 5)
                 </label>
                 {form.specs.map((spec, i) => (
@@ -648,16 +698,22 @@ export default function Admin() {
 
               {/* Submit */}
               <div style={{ display: 'flex', gap: 10, paddingBottom: 8 }}>
-                <button onClick={handleSubmit}
-                  disabled={!form.name || !form.price || !form.images?.length}
-                  // et
-                 {{ color: (!form.name || !form.price || !form.images?.length) ? 'var(--grey)' : '#000',
-                  background: (!form.name || !form.price || !form.images?.length) ? 'var(--border)' : 'linear-gradient(...)',
-                  cursor: (!form.name || !form.price || !form.images?.length) ? 'not-allowed' : 'pointer',
+                <button onClick={handleSubmit} disabled={!canSubmit || imageLoading}
+                  style={{
+                    flex: 1,
+                    background: canSubmit ? 'linear-gradient(90deg, var(--gold), var(--gold-light))' : 'var(--border)',
+                    color: canSubmit ? '#000' : 'var(--grey)',
+                    padding: '14px', borderRadius: 8,
+                    fontFamily: 'var(--font-condensed)', fontSize: 15,
+                    fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                    cursor: canSubmit ? 'pointer' : 'not-allowed',
+                    transition: 'opacity 0.2s',
+                    opacity: imageLoading ? 0.7 : 1,
                   }}
                 >
                   <Check size={16} />
-                  {editing ? 'Enregistrer' : 'Ajouter'}
+                  {imageLoading ? 'Upload en cours...' : editing ? 'Enregistrer' : 'Ajouter'}
                 </button>
                 <button onClick={() => setShowForm(false)} style={{
                   border: '1px solid var(--border)', color: 'var(--grey)',
@@ -667,6 +723,7 @@ export default function Admin() {
                   Annuler
                 </button>
               </div>
+
             </div>
           </div>
         </div>
