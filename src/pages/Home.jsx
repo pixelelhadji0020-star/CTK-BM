@@ -1,17 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MessageCircle } from 'lucide-react';
-import { getProducts, CATEGORIES, WHATSAPP_NUMBER } from '../data/products';
+import { getProducts, seedProducts, CATEGORIES, WHATSAPP_NUMBER } from '../data/products';
 import ProductCard from '../components/ProductCard';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
-  useEffect(() => { setProducts(getProducts()); }, []);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function init() {
+      try {
+        await seedProducts();
+        const data = await getProducts();
+        setProducts(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Erreur chargement:', err);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    init();
+  }, []);
 
   const byCategory = Object.keys(CATEGORIES).reduce((acc, key) => {
-    acc[key] = products.filter(p => p.category === key).slice(0, 3);
+    acc[key] = Array.isArray(products) ? products.filter(p => p.category === key).slice(0, 3) : [];
     return acc;
   }, {});
+
+  if (loading) return (
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center',
+      justifyContent: 'center', flexDirection: 'column', gap: 16,
+      background: 'var(--black)',
+    }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: '50%',
+        border: '3px solid var(--border)',
+        borderTopColor: 'var(--gold)',
+        animation: 'spin 0.8s linear infinite',
+      }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <p style={{
+        fontFamily: 'var(--font-condensed)', fontSize: 13,
+        letterSpacing: 3, color: 'var(--grey)', textTransform: 'uppercase',
+      }}>Chargement...</p>
+    </div>
+  );
 
   return (
     <div>
@@ -28,9 +64,7 @@ export default function Home() {
           position: 'absolute', inset: 0, pointerEvents: 'none',
           background: 'radial-gradient(ellipse 70% 50% at 50% 60%, rgba(201,168,76,0.07) 0%, transparent 70%)',
         }} />
-
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 560, width: '100%' }}>
-          {/* Badge */}
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
             border: '1px solid rgba(201,168,76,0.35)',
@@ -38,19 +72,12 @@ export default function Home() {
             padding: '6px 16px', borderRadius: 99, marginBottom: 28,
             animation: 'fadeUp 0.5s 0.1s both',
           }}>
-            <span style={{
-              width: 6, height: 6, borderRadius: '50%',
-              background: 'var(--gold)', display: 'inline-block',
-            }} />
-            <span style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 12,
-              letterSpacing: 3, textTransform: 'uppercase', color: 'var(--gold-light)',
-            }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--gold)', display: 'inline-block' }} />
+            <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 3, textTransform: 'uppercase', color: 'var(--gold-light)' }}>
               Dakar, Sénégal
             </span>
           </div>
 
-          {/* Title */}
           <h1 style={{
             fontFamily: 'var(--font-display)',
             fontSize: 'clamp(56px, 18vw, 100px)',
@@ -61,8 +88,7 @@ export default function Home() {
             <span style={{
               background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            }}>&</span>
-            BM
+            }}>&</span>BM
           </h1>
 
           <p style={{
@@ -73,7 +99,6 @@ export default function Home() {
             Téléphones, voitures et chaussures de qualité — commandez directement sur WhatsApp.
           </p>
 
-          {/* Category pills */}
           <div style={{
             display: 'flex', gap: 10, justifyContent: 'center',
             flexWrap: 'wrap', marginBottom: 32,
@@ -88,21 +113,14 @@ export default function Home() {
                 letterSpacing: 1.5, textTransform: 'uppercase',
                 color: 'var(--off-white)', transition: 'border-color 0.2s, background 0.2s',
               }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = 'var(--gold)';
-                  e.currentTarget.style.background = 'rgba(201,168,76,0.07)';
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                  e.currentTarget.style.background = 'var(--card)';
-                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--gold)'; e.currentTarget.style.background = 'rgba(201,168,76,0.07)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.background = 'var(--card)'; }}
               >
                 {icon} {label}
               </Link>
             ))}
           </div>
 
-          {/* CTA */}
           <div style={{ animation: 'fadeUp 0.6s 0.5s both' }}>
             <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Bonjour CTK&BM ! Je souhaite passer une commande.")}`}
               target="_blank" rel="noopener noreferrer"
@@ -123,74 +141,59 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORY SECTIONS */}
+      {/* SECTIONS CATÉGORIES */}
       {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
-        <section key={key} style={{ padding: '64px 0' }}>
-          <div className="container">
-            <div style={{
-              display: 'flex', justifyContent: 'space-between',
-              alignItems: 'flex-end', marginBottom: 28,
-              borderBottom: '1px solid var(--border)', paddingBottom: 16,
-            }}>
-              <div>
-                <div style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 11,
-                  letterSpacing: 4, textTransform: 'uppercase',
-                  color: 'var(--gold)', marginBottom: 4,
-                }}>
-                  {icon} Sélection
+        byCategory[key].length > 0 && (
+          <section key={key} style={{ padding: '64px 0' }}>
+            <div className="container">
+              <div style={{
+                display: 'flex', justifyContent: 'space-between',
+                alignItems: 'flex-end', marginBottom: 28,
+                borderBottom: '1px solid var(--border)', paddingBottom: 16,
+              }}>
+                <div>
+                  <div style={{ fontFamily: 'var(--font-condensed)', fontSize: 11, letterSpacing: 4, textTransform: 'uppercase', color: 'var(--gold)', marginBottom: 4 }}>
+                    {icon} Sélection
+                  </div>
+                  <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(32px, 8vw, 52px)', letterSpacing: 2 }}>
+                    {label.toUpperCase()}
+                  </h2>
                 </div>
-                <h2 style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: 'clamp(32px, 8vw, 52px)', letterSpacing: 2,
-                }}>
-                  {label.toUpperCase()}
-                </h2>
+                <Link to={`/categorie/${key}`} style={{
+                  display: 'flex', alignItems: 'center', gap: 5,
+                  fontFamily: 'var(--font-condensed)', fontSize: 13,
+                  letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+                  transition: 'gap 0.2s',
+                }}
+                  onMouseEnter={e => e.currentTarget.style.gap = '10px'}
+                  onMouseLeave={e => e.currentTarget.style.gap = '5px'}
+                >
+                  Tout voir <ArrowRight size={14} />
+                </Link>
               </div>
-              <Link to={`/categorie/${key}`} style={{
-                display: 'flex', alignItems: 'center', gap: 5,
-                fontFamily: 'var(--font-condensed)', fontSize: 13,
-                letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-                transition: 'gap 0.2s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.gap = '10px'}
-                onMouseLeave={e => e.currentTarget.style.gap = '5px'}
-              >
-                Tout voir <ArrowRight size={14} />
-              </Link>
-            </div>
 
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-              gap: 20,
-            }}>
-              {byCategory[key].map((product, i) => (
-                <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
-                  <ProductCard product={product} />
-                </div>
-              ))}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 20 }}>
+                {byCategory[key].map((product, i) => (
+                  <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )
       ))}
 
-      {/* BOTTOM BANNER */}
+      {/* BANNIÈRE */}
       <section style={{
         background: 'linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 50%, var(--gold-light) 100%)',
         padding: '52px 16px', textAlign: 'center',
       }}>
         <div className="container">
-          <p style={{
-            fontFamily: 'var(--font-condensed)', fontSize: 12,
-            letterSpacing: 4, textTransform: 'uppercase',
-            color: 'rgba(0,0,0,0.55)', marginBottom: 10,
-          }}>Service client 7j/7</p>
-          <h2 style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(28px, 8vw, 56px)',
-            color: '#000', letterSpacing: 2, marginBottom: 24,
-          }}>
+          <p style={{ fontFamily: 'var(--font-condensed)', fontSize: 12, letterSpacing: 4, textTransform: 'uppercase', color: 'rgba(0,0,0,0.55)', marginBottom: 10 }}>
+            Service client 7j/7
+          </p>
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(28px, 8vw, 56px)', color: '#000', letterSpacing: 2, marginBottom: 24 }}>
             UNE QUESTION ? ON EST LÀ.
           </h2>
           <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Bonjour CTK&BM ! J'ai une question.")}`}
