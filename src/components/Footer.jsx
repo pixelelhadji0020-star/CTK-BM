@@ -4,8 +4,8 @@ import { MessageCircle, MapPin, Phone } from 'lucide-react';
 import { CATEGORIES, WHATSAPP_NUMBER } from '../data/products';
 
 export default function Footer() {
-  // Remplace ce chemin par le lien de ton image de logo (ex: '/logo.png' ou un lien absolu)
-  const logoUrl = "/logo.png"; 
+  // Chemin exact de votre logo placé dans le dossier public
+  const logoSrc = "/logo-ctkbm.png";
 
   return (
     <footer style={{
@@ -42,18 +42,17 @@ export default function Footer() {
       {/* Corps */}
       <div style={{ padding: '36px 20px 20px', maxWidth: 1100, margin: '0 auto' }}>
 
-        {/* Brand Section */}
+        {/* Brand */}
         <div style={{ marginBottom: 32 }}>
-          {/* Logo à la place du texte en haut à gauche de la section */}
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 12 }}>
             <img 
-              src={logoUrl} 
+              src={logoSrc} 
               alt="CTK & BM Logo" 
-              style={{ maxHeight: '50px', width: 'auto', display: 'block' }}
+              style={{ height: '50px', width: 'auto', display: 'block' }}
               onError={(e) => {
-                // Secours au cas où l'image ne charge pas (affiche le texte stylisé)
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'block';
+                // Fallback si l'image a un problème de chemin : affiche le texte stylisé
+                e.currentTarget.style.display = 'none';
+                if(e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
               }}
             />
             <div style={{
@@ -67,12 +66,11 @@ export default function Footer() {
               }}>&</span>BM
             </div>
           </div>
-
           <p style={{ color: 'var(--grey)', fontSize: 13, lineHeight: 1.7, maxWidth: 300, marginBottom: 20 }}>
             Votre boutique de confiance à Dakar pour les téléphones, voitures et chaussures.
           </p>
 
-          {/* Bouton Écosystème Services */}
+          {/* Bouton Services Écosystème */}
           <div style={{ marginBottom: 24 }}>
             <a 
               href="https://ctk-automobiles.vercel.app/" 
@@ -135,8 +133,8 @@ export default function Footer() {
         {/* Ligne séparatrice */}
         <div style={{ height: 1, background: 'var(--border)', marginBottom: 28 }} />
 
-        {/* Grille responsive modifiée (ajout de la classe ctk-footer-content) */}
-        <div className="ctk-footer-content" style={{
+        {/* Grille des liens avec classe responsive */}
+        <div className="footer-responsive-grid" style={{
           display: 'flex',
           flexDirection: 'row',
           flexWrap: 'wrap',
@@ -206,7 +204,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="ctk-bottom-bar" style={{
+        <div className="footer-bottom-bar" style={{
           borderTop: '1px solid var(--border)', paddingTop: 18,
           display: 'flex', justifyContent: 'space-between',
           alignItems: 'center', gap: 8,
@@ -224,17 +222,17 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Media queries mobiles strictes et corrigées */}
+      {/* Correctif CSS Mobile Strict */}
       <style>{`
-        @media (max-width: 560px) {
-          .ctk-footer-content { 
-            flex-direction: column !important; 
-            gap: 24px !important;
+        @media (max-width: 768px) {
+          .footer-responsive-grid {
+            flex-direction: column !important;
+            gap: 28px !important;
           }
-          .ctk-bottom-bar {
+          .footer-bottom-bar {
             flex-direction: column !important;
             text-align: center !important;
-            gap: 12px !important;
+            gap: 14px !important;
           }
         }
       `}</style>
