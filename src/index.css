@@ -67,3 +67,28 @@ img { max-width: 100%; display: block; }
   scrollbar-width: none;
 }
 .scroll-x::-webkit-scrollbar { display: none; }
+
+/* Bouton de redirection vers l'écosystème CTK & BM */
+.btn-ctk-services {
+  display: inline-block;
+  font-family: var(--font-condensed);
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--black);
+  background: linear-gradient(90deg, var(--gold), var(--gold-light));
+  padding: 12px 28px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px var(--gold-glow);
+  transition: all 0.3s ease;
+  margin: 20px 0;
+}
+
+.btn-ctk-services:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(201, 168, 76, 0.25);
+  background: linear-gradient(90deg, var(--gold-light), var(--gold));
+}
+
+
