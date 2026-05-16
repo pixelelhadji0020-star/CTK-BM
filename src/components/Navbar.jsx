@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { CATEGORIES } from '../data/products';
+import { Menu, X } from 'lucide-react'; // Assure-toi que ces icônes sont installées
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -22,8 +22,8 @@ export default function Navbar() {
 
   const navLinks = [
     { to: '/', label: 'Accueil' },
-    { to: '/#catalogue', label: 'Catalogue', scroll: true },
-    { to: '/#apropos', label: 'À propos', scroll: true },
+    { to: '/#catalogue', label: 'Menu', id: 'catalogue' },
+    { to: '/#apropos', label: 'À propos', id: 'apropos' },
   ];
 
   function handleScroll(e, id) {
@@ -40,200 +40,121 @@ export default function Navbar() {
     <>
       <header style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        background: scrolled ? 'rgba(6,6,6,0.97)' : 'rgba(6,6,6,0.55)',
+        background: scrolled ? 'rgba(10, 10, 10, 0.95)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(10px)' : 'none',
         borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        transition: 'all 0.3s',
+        transition: 'all 0.3s ease',
       }}>
         <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          height: 64, padding: '0 24px',
-          maxWidth: 1100, margin: '0 auto',
+          maxWidth: 1200, margin: '0 auto', padding: '16px 20px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between'
         }}>
-
-          {/* Logo image */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 110 }}>
-            <img
-              src="/logo.png"
-              alt="CTK&BM"
-              style={{ height: 44, width: 44, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(201,168,76,0.3)' }}
-              onError={e => { e.target.style.display = 'none'; }}
+          
+          {/* LOGO EN HAUT À GAUCHE */}
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+            <img 
+              src="/logo-ctkbm.png" 
+              alt="CTK & BM" 
+              style={{ 
+                height: '40px', 
+                width: 'auto', 
+                objectFit: 'contain',
+                display: 'block'
+              }} 
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                if(e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
+              }}
             />
-            <span style={{
-              fontFamily: 'var(--font-display)', fontSize: 20,
-              letterSpacing: 3, color: 'var(--white)',
+            <span style={{ 
+              display: 'none', 
+              fontFamily: 'var(--font-display)', 
+              fontSize: '22px', 
+              color: '#fff', 
+              letterSpacing: '2px' 
             }}>
-              CTK<span style={{
-                background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              }}>&</span>BM
+              CTK & BM
             </span>
           </Link>
 
-          {/* Desktop nav — Accueil / Catalogue / À propos */}
-          <nav style={{ display: 'flex', gap: 36, alignItems: 'center' }} className="desktop-nav">
-            <Link to="/" style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 14,
-              letterSpacing: 2, textTransform: 'uppercase',
-              color: location.pathname === '/' && !window.location.hash ? 'var(--gold-light)' : 'var(--grey-light)',
-              borderBottom: location.pathname === '/' && !window.location.hash ? '1px solid var(--gold)' : '1px solid transparent',
-              paddingBottom: 2, transition: 'color 0.2s',
-            }}>
-              Accueil
-            </Link>
-            <a href="#catalogue" onClick={e => handleScroll(e, 'catalogue')} style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 14,
-              letterSpacing: 2, textTransform: 'uppercase',
-              color: 'var(--grey-light)', borderBottom: '1px solid transparent',
-              paddingBottom: 2, transition: 'color 0.2s', cursor: 'pointer',
-            }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--off-white)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'var(--grey-light)'}
-            >
-              Catalogue
-            </a>
-            <a href="#apropos" onClick={e => handleScroll(e, 'apropos')} style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 14,
-              letterSpacing: 2, textTransform: 'uppercase',
-              color: 'var(--grey-light)', borderBottom: '1px solid transparent',
-              paddingBottom: 2, transition: 'color 0.2s', cursor: 'pointer',
-            }}
-              onMouseEnter={e => e.currentTarget.style.color = 'var(--off-white)'}
-              onMouseLeave={e => e.currentTarget.style.color = 'var(--grey-light)'}
-            >
-              À propos
-            </a>
+          {/* MENU HORIZONTAL DESKTOP */}
+          <nav className="nav-desktop-links" style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+            {navLinks.map((link) => (
+              link.id ? (
+                <a 
+                  key={link.label}
+                  href={link.to}
+                  onClick={(e) => handleScroll(e, link.id)}
+                  style={{
+                    color: 'var(--grey-light)', textDecoration: 'none',
+                    fontFamily: 'var(--font-condensed)', fontSize: 15,
+                    fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={e => e.target.style.color = 'var(--gold)'}
+                  onMouseLeave={e => e.target.style.color = 'var(--grey-light)'}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link 
+                  key={link.label}
+                  to={link.to}
+                  style={{
+                    color: 'var(--grey-light)', textDecoration: 'none',
+                    fontFamily: 'var(--font-condensed)', fontSize: 15,
+                    fontWeight: 600, letterSpacing: 1.5, textTransform: 'uppercase',
+                    transition: 'color 0.2s'
+                  }}
+                  onMouseEnter={e => e.target.style.color = 'var(--gold)'}
+                  onMouseLeave={e => e.target.style.color = 'var(--grey-light)'}
+                >
+                  {link.label}
+                </Link>
+              )
+            ))}
           </nav>
 
-          {/* Burger */}
-          <button
+          {/* Bouton Burger Mobile */}
+          <button 
             onClick={() => setOpen(!open)}
             style={{
-              display: 'none', flexDirection: 'column', gap: 5,
-              width: 38, height: 38, alignItems: 'center', justifyContent: 'center',
-              zIndex: 110, borderRadius: 8,
-              background: open ? 'rgba(201,168,76,0.12)' : 'transparent',
-              border: '1px solid',
-              borderColor: open ? 'rgba(201,168,76,0.3)' : 'var(--border)',
-              transition: 'all 0.2s',
+              display: 'none', background: 'none', border: 'none', color: '#fff', cursor: 'pointer'
             }}
-            className="hamburger"
+            className="burger-button"
           >
-            {[
-              open ? 'translateY(6.5px) rotate(45deg)' : 'none',
-              null,
-              open ? 'translateY(-6.5px) rotate(-45deg)' : 'none',
-            ].map((transform, i) => (
-              <span key={i} style={{
-                display: 'block', width: 18, height: 1.5, borderRadius: 2,
-                background: open ? 'var(--gold)' : 'var(--white)',
-                transform: transform || 'none',
-                opacity: i === 1 && open ? 0 : 1,
-                transition: 'all 0.25s',
-              }} />
-            ))}
+            {open ? <X size={24} /> : <Menu size={24} />}
           </button>
+
         </div>
       </header>
 
-      {/* Mobile fullscreen menu */}
+      {/* Menu Tiroir Mobile */}
       <div style={{
-        position: 'fixed', inset: 0, zIndex: 99,
-        background: 'rgba(6,6,6,0.98)',
-        backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)',
-        display: 'flex', flexDirection: 'column',
-        justifyContent: 'center', alignItems: 'center',
-        gap: 12, padding: '80px 24px 40px',
-        opacity: open ? 1 : 0,
-        pointerEvents: open ? 'all' : 'none',
-        transition: 'opacity 0.3s ease',
+        position: 'fixed', top: 0, bottom: 0, left: 0, right: 0, zIndex: 99,
+        background: '#0a0a0a', display: open ? 'flex' : 'none',
+        flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24,
+        padding: 20
       }}>
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(201,168,76,0.06) 0%, transparent 70%)',
-        }} />
-
-        {/* Logo dans le menu mobile */}
-        <img src="/logo.png" alt="CTK&BM" style={{
-          width: 72, height: 72, borderRadius: '50%', objectFit: 'cover',
-          border: '2px solid rgba(201,168,76,0.4)',
-          marginBottom: 8,
-          opacity: open ? 1 : 0,
-          transform: open ? 'scale(1)' : 'scale(0.8)',
-          transition: 'all 0.4s ease',
-        }} onError={e => e.target.style.display = 'none'} />
-
-        {/* Liens Accueil / Catalogue / À propos */}
-        {[
-          { label: 'Accueil', id: null, to: '/' },
-          { label: 'Catalogue', id: 'catalogue' },
-          { label: 'À propos', id: 'apropos' },
-        ].map(({ label, id, to }, i) => (
-          id ? (
-            <a key={label} href={`#${id}`}
-              onClick={e => handleScroll(e, id)}
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                width: '100%', maxWidth: 300,
-                padding: '18px 24px',
-                border: '1px solid var(--border)',
-                borderRadius: 14,
-                background: 'rgba(255,255,255,0.02)',
-                transform: open ? 'translateY(0)' : 'translateY(20px)',
-                opacity: open ? 1 : 0,
-                transition: `all 0.35s ${i * 0.07}s ease`,
-                cursor: 'pointer',
-              }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, letterSpacing: 2, color: 'var(--white)' }}>
-                {label.toUpperCase()}
-              </span>
-              <span style={{ color: 'var(--gold)', fontSize: 20 }}>›</span>
-            </a>
-          ) : (
-            <Link key={label} to={to} style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              width: '100%', maxWidth: 300,
-              padding: '18px 24px',
-              border: '1px solid var(--border)',
-              borderRadius: 14,
-              background: 'rgba(255,255,255,0.02)',
-              transform: open ? 'translateY(0)' : 'translateY(20px)',
-              opacity: open ? 1 : 0,
-              transition: `all 0.35s ${i * 0.07}s ease`,
-            }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: 26, letterSpacing: 2, color: 'var(--white)' }}>
-                {label.toUpperCase()}
-              </span>
-              <span style={{ color: 'var(--gold)', fontSize: 20 }}>›</span>
-            </Link>
-          )
+        {navLinks.map((link) => (
+          <a
+            key={link.label}
+            href={link.to}
+            onClick={(e) => link.id ? handleScroll(e, link.id) : setOpen(false)}
+            style={{
+              color: '#fff', textDecoration: 'none', fontSize: 24,
+              fontFamily: 'var(--font-display)', letterSpacing: 2
+            }}
+          >
+            {link.label.toUpperCase()}
+          </a>
         ))}
-
-        {/* WhatsApp */}
-        <a href="https://wa.me/221771018557"
-          target="_blank" rel="noopener noreferrer"
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
-            width: '100%', maxWidth: 300, marginTop: 8,
-            padding: '15px 24px', borderRadius: 99,
-            background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-            color: '#000',
-            fontFamily: 'var(--font-condensed)', fontSize: 15,
-            fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
-            transform: open ? 'translateY(0)' : 'translateY(20px)',
-            opacity: open ? 1 : 0,
-            transition: 'all 0.35s 0.21s ease',
-          }}>
-          💬 Contacter sur WhatsApp
-        </a>
       </div>
 
       <style>{`
-        @media (max-width: 700px) {
-          .desktop-nav { display: none !important; }
-          .hamburger { display: flex !important; }
+        @media (max-width: 768px) {
+          .nav-desktop-links { display: none !important; }
+          .burger-button { display: block !important; }
         }
       `}</style>
     </>
