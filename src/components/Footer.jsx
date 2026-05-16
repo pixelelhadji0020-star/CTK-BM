@@ -51,9 +51,43 @@ export default function Footer() {
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             }}>&</span>BM
           </div>
-          <p style={{ color: 'var(--grey)', fontSize: 13, lineHeight: 1.7, maxWidth: 300 }}>
+          <p style={{ color: 'var(--grey)', fontSize: 13, lineHeight: 1.7, maxWidth: 300, marginBottom: 20 }}>
             Votre boutique de confiance à Dakar pour les téléphones, voitures et chaussures.
           </p>
+
+          {/* BOUTON ÉCOSYSTÈME SERVICES - INTÉGRÉ ICI */}
+          <div style={{ marginBottom: 24 }}>
+            <a 
+              href="https://ctk-automobiles.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                fontFamily: 'var(--font-condensed)',
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '1.5px',
+                textTransform: 'uppercase',
+                color: 'var(--black)',
+                background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
+                padding: '12px 24px',
+                borderRadius: 4,
+                boxShadow: '0 4px 12px var(--gold-glow)',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 18px rgba(201, 168, 76, 0.25)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px var(--gold-glow)';
+              }}
+            >
+              Découvrir tous les services de CTK & BM
+            </a>
+          </div>
+
           {/* Icônes réseaux */}
           <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
             <a href={`https://wa.me/${WHATSAPP_NUMBER}`}
