@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { getProducts, seedProducts, CATEGORIES, WHATSAPP_NUMBER } from '../data/products';
@@ -37,17 +37,12 @@ export default function Home() {
       alert('Veuillez remplir tous les champs.');
       return;
     }
-    const msg = `Bonjour CTK&BM ! 🚗
-
-Je souhaite trouver un véhicule spécifique.
-
-👤 Prénom : ${prenom}
-👤 Nom : ${nom}
-📞 Téléphone : ${telephone}
-🚘 Véhicule souhaité : ${vehicule}
-
-Merci de me recontacter dans les 48h. 🙏`;
+    const msg = `Bonjour CTK&BM ! 🚗\n\nJe souhaite trouver un véhicule spécifique.\n\n👤 Prénom : ${prenom}\n👤 Nom : ${nom}\n📞 Téléphone : ${telephone}\n🚘 Véhicule souhaité : ${vehicule}\n\nMerci de me recontacter dans les 48h. 🙏`;
     window.open(`https://wa.me/221776729740?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+
+  function scrollTo(id) {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }
 
   if (loading) return (
@@ -62,9 +57,10 @@ Merci de me recontacter dans les 48h. 🙏`;
         animation: 'spin 0.8s linear infinite',
       }} />
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <p style={{ fontFamily: 'var(--font-condensed)', fontSize: 13, letterSpacing: 3, color: 'var(--grey)', textTransform: 'uppercase' }}>
-        Chargement...
-      </p>
+      <p style={{
+        fontFamily: 'var(--font-condensed)', fontSize: 13,
+        letterSpacing: 3, color: 'var(--grey)', textTransform: 'uppercase',
+      }}>Chargement...</p>
     </div>
   );
 
@@ -80,44 +76,38 @@ Merci de me recontacter dans les 48h. 🙏`;
         position: 'relative', overflow: 'hidden',
         background: 'var(--black)',
       }}>
-        {/* Logo géant en arrière-plan */}
+        {/* Logo géant en fond */}
         <div style={{
-          position: 'absolute', inset: 0,
+          position: 'absolute', inset: 0, zIndex: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          pointerEvents: 'none', zIndex: 0,
+          pointerEvents: 'none',
         }}>
-          <img src="/logo.png" alt=""
-            style={{
-              width: 'min(70vw, 480px)', height: 'min(70vw, 480px)',
-              objectFit: 'cover', borderRadius: '50%',
-              opacity: 0.06,
-              filter: 'grayscale(100%)',
-            }}
-            onError={e => e.target.style.display = 'none'}
-          />
+          <img src="/logo.png" alt="" style={{
+            width: 'min(72vw, 480px)', height: 'min(72vw, 480px)',
+            objectFit: 'cover', borderRadius: '50%',
+            opacity: 0.055, filter: 'grayscale(100%)',
+          }} onError={e => e.target.style.display = 'none'} />
         </div>
 
-        {/* Radial gold glow */}
+        {/* Glow */}
         <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
-          background: 'radial-gradient(ellipse 65% 55% at 50% 55%, rgba(201,168,76,0.09) 0%, transparent 70%)',
+          position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none',
+          background: 'radial-gradient(ellipse 65% 55% at 50% 55%, rgba(201,168,76,0.08) 0%, transparent 70%)',
         }} />
 
         {/* Contenu */}
-        <div style={{ position: 'relative', zIndex: 2, maxWidth: 560, width: '100%' }}>
+        <div style={{ position: 'relative', zIndex: 2, maxWidth: 540, width: '100%' }}>
 
-          {/* Logo visible centré */}
-          <div style={{
-            display: 'flex', justifyContent: 'center', marginBottom: 24,
-            animation: 'fadeUp 0.5s 0.05s both',
-          }}>
+          {/* Logo rond */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 22, animation: 'fadeUp 0.5s 0.05s both' }}>
             <div style={{
-              width: 90, height: 90, borderRadius: '50%',
+              width: 88, height: 88, borderRadius: '50%',
               border: '2px solid rgba(201,168,76,0.4)',
               overflow: 'hidden',
-              boxShadow: '0 0 32px rgba(201,168,76,0.15)',
+              boxShadow: '0 0 32px rgba(201,168,76,0.14)',
             }}>
-              <img src="/logo.png" alt="CTK&BM" style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              <img src="/logo.png" alt="CTK&BM"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 onError={e => e.target.style.display = 'none'} />
             </div>
           </div>
@@ -127,11 +117,14 @@ Merci de me recontacter dans les 48h. 🙏`;
             display: 'inline-flex', alignItems: 'center', gap: 8,
             border: '1px solid rgba(201,168,76,0.35)',
             background: 'rgba(201,168,76,0.06)',
-            padding: '5px 16px', borderRadius: 99, marginBottom: 20,
+            padding: '5px 16px', borderRadius: 99, marginBottom: 18,
             animation: 'fadeUp 0.5s 0.1s both',
           }}>
             <span style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--gold)', display: 'inline-block' }} />
-            <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: 'var(--gold-light)' }}>
+            <span style={{
+              fontFamily: 'var(--font-condensed)', fontSize: 11,
+              letterSpacing: 3, textTransform: 'uppercase', color: 'var(--gold-light)',
+            }}>
               Business & Trading — Dakar
             </span>
           </div>
@@ -143,17 +136,17 @@ Merci de me recontacter dans les 48h. 🙏`;
             lineHeight: 0.95, letterSpacing: 2, marginBottom: 8,
             animation: 'fadeUp 0.6s 0.2s both',
           }}>
-            CTK<span style={{
+            CTK
+            <span style={{
               background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             }}>&</span>BM
           </h1>
 
-          {/* Sous-titre */}
           <p style={{
-            fontFamily: 'var(--font-condensed)', fontSize: 14,
+            fontFamily: 'var(--font-condensed)', fontSize: 13,
             letterSpacing: 4, textTransform: 'uppercase',
-            color: 'var(--gold)', marginBottom: 16,
+            color: 'var(--gold)', marginBottom: 14,
             animation: 'fadeUp 0.6s 0.25s both',
           }}>
             Business & Trading
@@ -161,7 +154,7 @@ Merci de me recontacter dans les 48h. 🙏`;
 
           <p style={{
             color: 'var(--grey-light)', fontSize: 'clamp(14px, 3.5vw, 16px)',
-            lineHeight: 1.75, maxWidth: 360, margin: '0 auto 32px',
+            lineHeight: 1.75, maxWidth: 360, margin: '0 auto 30px',
             animation: 'fadeUp 0.6s 0.3s both',
           }}>
             Téléphones, voitures et chaussures de qualité — trouvez ce que vous cherchez et commandez directement sur WhatsApp.
@@ -172,20 +165,21 @@ Merci de me recontacter dans les 48h. 🙏`;
             display: 'flex', gap: 12, justifyContent: 'center',
             flexWrap: 'wrap', animation: 'fadeUp 0.6s 0.4s both',
           }}>
-            <a href="#catalogue" onClick={e => { e.preventDefault(); document.getElementById('catalogue')?.scrollIntoView({ behavior: 'smooth' }); }}
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-                color: '#000', padding: '14px 28px', borderRadius: 99,
-                fontFamily: 'var(--font-condensed)', fontSize: 15,
-                fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
-                transition: 'opacity 0.2s, transform 0.15s',
-              }}
+            <button onClick={() => scrollTo('catalogue')} style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
+              color: '#000', padding: '14px 28px', borderRadius: 99,
+              fontFamily: 'var(--font-condensed)', fontSize: 15,
+              fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase',
+              transition: 'opacity 0.2s, transform 0.15s', border: 'none',
+              cursor: 'pointer',
+            }}
               onMouseEnter={e => { e.currentTarget.style.opacity = '0.88'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
               onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
             >
               Voir le catalogue <ArrowRight size={15} />
-            </a>
+            </button>
+
             <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Bonjour CTK&BM !")}`}
               target="_blank" rel="noopener noreferrer"
               style={{
@@ -211,10 +205,7 @@ Merci de me recontacter dans les 48h. 🙏`;
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6,
           animation: 'fadeIn 1s 1s both',
         }}>
-          <div style={{
-            width: 1, height: 36,
-            background: 'linear-gradient(to bottom, var(--gold), transparent)',
-          }} />
+          <div style={{ width: 1, height: 36, background: 'linear-gradient(to bottom, var(--gold), transparent)' }} />
           <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 9, letterSpacing: 3, color: 'var(--grey)', textTransform: 'uppercase' }}>
             Scroll
           </span>
@@ -222,10 +213,10 @@ Merci de me recontacter dans les 48h. 🙏`;
       </section>
 
       {/* ── CATALOGUE ── */}
-      <div id="catalogue" />
+      <div id="catalogue" style={{ paddingTop: 8 }} />
       {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
         byCategory[key].length > 0 && (
-          <section key={key} style={{ padding: '64px 0' }}>
+          <section key={key} style={{ padding: '60px 0' }}>
             <div className="container">
               <div style={{
                 display: 'flex', justifyContent: 'space-between',
@@ -276,14 +267,14 @@ Merci de me recontacter dans les 48h. 🙏`;
         )
       ))}
 
-      {/* ── SECTION À PROPOS ── */}
+      {/* ── À PROPOS — Formulaire véhicule ── */}
       <section id="apropos" style={{
         padding: '80px 20px',
         background: 'var(--deep)',
         borderTop: '1px solid var(--border)',
       }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <div style={{
               fontFamily: 'var(--font-condensed)', fontSize: 11,
               letterSpacing: 4, textTransform: 'uppercase',
@@ -293,53 +284,52 @@ Merci de me recontacter dans les 48h. 🙏`;
             </div>
             <h2 style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(32px, 7vw, 56px)', letterSpacing: 2, marginBottom: 16,
+              fontSize: 'clamp(30px, 7vw, 54px)', letterSpacing: 2, marginBottom: 14,
             }}>
               TROUVEZ VOTRE VÉHICULE
             </h2>
             <p style={{
               color: 'var(--grey-light)', fontSize: 15, lineHeight: 1.8,
-              maxWidth: 500, margin: '0 auto',
+              maxWidth: 480, margin: '0 auto',
             }}>
-              Vous cherchez un véhicule précis ? Remplissez le formulaire ci-dessous. Notre équipe s'engage à vous trouver le véhicule de vos rêves en <strong style={{ color: 'var(--gold-light)' }}>moins de 48h</strong>.
+              Vous cherchez un véhicule précis ? Remplissez le formulaire. Notre équipe s'engage à vous trouver le véhicule de vos rêves en{' '}
+              <strong style={{ color: 'var(--gold-light)' }}>moins de 48h</strong>.
             </p>
           </div>
 
-          {/* Formulaire */}
           <div style={{
             background: 'var(--card)', border: '1px solid var(--border)',
-            borderRadius: 20, padding: 'clamp(24px, 5vw, 48px)',
-            maxWidth: 560, margin: '0 auto',
+            borderRadius: 20, padding: 'clamp(24px, 5vw, 44px)',
+            maxWidth: 540, margin: '0 auto',
           }}>
-            {/* Icône */}
             <div style={{
-              width: 60, height: 60, borderRadius: 16,
+              width: 56, height: 56, borderRadius: 14,
               background: 'linear-gradient(135deg, var(--gold), var(--gold-light))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 28, marginBottom: 28,
+              fontSize: 26, marginBottom: 24,
             }}>🚗</div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+
               {/* Prénom + Nom */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                 {[
                   { key: 'prenom', label: 'Prénom', placeholder: 'Votre prénom' },
                   { key: 'nom', label: 'Nom', placeholder: 'Votre nom' },
                 ].map(({ key, label, placeholder }) => (
-                  <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                     <label style={{
-                      fontFamily: 'var(--font-condensed)', fontSize: 11,
+                      fontFamily: 'var(--font-condensed)', fontSize: 10,
                       letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
                     }}>{label}</label>
-                    <input
-                      type="text" placeholder={placeholder}
+                    <input type="text" placeholder={placeholder}
                       value={formData[key]}
                       onChange={e => setFormData(f => ({ ...f, [key]: e.target.value }))}
                       style={{
                         background: 'var(--black)', border: '1px solid var(--border)',
-                        color: 'var(--white)', padding: '11px 14px', fontSize: 14,
-                        borderRadius: 8, outline: 'none', transition: 'border-color 0.2s',
-                        width: '100%',
+                        color: 'var(--white)', padding: '11px 12px', fontSize: 14,
+                        borderRadius: 8, outline: 'none', width: '100%',
+                        transition: 'border-color 0.2s',
                       }}
                       onFocus={e => e.target.style.borderColor = 'var(--gold)'}
                       onBlur={e => e.target.style.borderColor = 'var(--border)'}
@@ -349,19 +339,19 @@ Merci de me recontacter dans les 48h. 🙏`;
               </div>
 
               {/* Téléphone */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <label style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 11,
+                  fontFamily: 'var(--font-condensed)', fontSize: 10,
                   letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
                 }}>Téléphone</label>
-                <input
-                  type="tel" placeholder="+221 77 000 00 00"
+                <input type="tel" placeholder="+221 77 000 00 00"
                   value={formData.telephone}
                   onChange={e => setFormData(f => ({ ...f, telephone: e.target.value }))}
                   style={{
                     background: 'var(--black)', border: '1px solid var(--border)',
-                    color: 'var(--white)', padding: '11px 14px', fontSize: 14,
-                    borderRadius: 8, outline: 'none', transition: 'border-color 0.2s',
+                    color: 'var(--white)', padding: '11px 12px', fontSize: 14,
+                    borderRadius: 8, outline: 'none',
+                    transition: 'border-color 0.2s',
                   }}
                   onFocus={e => e.target.style.borderColor = 'var(--gold)'}
                   onBlur={e => e.target.style.borderColor = 'var(--border)'}
@@ -369,36 +359,37 @@ Merci de me recontacter dans les 48h. 🙏`;
               </div>
 
               {/* Véhicule */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
                 <label style={{
-                  fontFamily: 'var(--font-condensed)', fontSize: 11,
+                  fontFamily: 'var(--font-condensed)', fontSize: 10,
                   letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
                 }}>Véhicule souhaité</label>
-                <textarea
-                  placeholder="Ex: Toyota Land Cruiser 2020, noir, automatique..."
-                  rows={3}
-                  value={formData.vehicule}
+                <textarea placeholder="Ex: Toyota Land Cruiser 2020, noir, automatique..."
+                  rows={3} value={formData.vehicule}
                   onChange={e => setFormData(f => ({ ...f, vehicule: e.target.value }))}
                   style={{
                     background: 'var(--black)', border: '1px solid var(--border)',
-                    color: 'var(--white)', padding: '11px 14px', fontSize: 14,
-                    borderRadius: 8, outline: 'none', transition: 'border-color 0.2s',
-                    resize: 'vertical',
+                    color: 'var(--white)', padding: '11px 12px', fontSize: 14,
+                    borderRadius: 8, outline: 'none', resize: 'vertical',
+                    transition: 'border-color 0.2s',
                   }}
                   onFocus={e => e.target.style.borderColor = 'var(--gold)'}
                   onBlur={e => e.target.style.borderColor = 'var(--border)'}
                 />
               </div>
 
-              {/* Garantie 48h */}
+              {/* Garantie */}
               <div style={{
                 display: 'flex', alignItems: 'center', gap: 10,
                 background: 'rgba(201,168,76,0.06)',
                 border: '1px solid rgba(201,168,76,0.2)',
-                padding: '12px 16px', borderRadius: 10,
+                padding: '11px 14px', borderRadius: 10,
               }}>
-                <span style={{ fontSize: 18 }}>⏱️</span>
-                <span style={{ fontFamily: 'var(--font-condensed)', fontSize: 13, color: 'var(--gold-light)', letterSpacing: 1 }}>
+                <span style={{ fontSize: 16 }}>⏱️</span>
+                <span style={{
+                  fontFamily: 'var(--font-condensed)', fontSize: 13,
+                  color: 'var(--gold-light)', letterSpacing: 1,
+                }}>
                   Réponse garantie en moins de 48h
                 </span>
               </div>
@@ -408,16 +399,15 @@ Merci de me recontacter dans les 48h. 🙏`;
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
                 background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
                 color: '#000', padding: '15px',
-                borderRadius: 10,
+                borderRadius: 10, border: 'none', cursor: 'pointer',
                 fontFamily: 'var(--font-condensed)', fontSize: 16,
                 fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase',
                 transition: 'opacity 0.2s, transform 0.15s',
-                marginTop: 4,
               }}
                 onMouseEnter={e => { e.currentTarget.style.opacity = '0.88'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
                 onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)'; }}
               >
-                <MessageCircle size={18} /> Envoyer sur WhatsApp
+                <MessageCircle size={17} /> Envoyer sur WhatsApp
               </button>
             </div>
           </div>
@@ -453,4 +443,13 @@ Merci de me recontacter dans les 48h. 🙏`;
               transition: 'transform 0.15s',
             }}
             onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-            onMouseLeave={e => e.currentTarget.style.
+            onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+          >
+            <MessageCircle size={17} /> Écrire sur WhatsApp
+          </a>
+        </div>
+      </section>
+
+    </div>
+  );
+}
