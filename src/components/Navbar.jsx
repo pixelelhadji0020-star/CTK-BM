@@ -155,7 +155,7 @@ export default function Navbar() {
         }} />
 
         {/* Logo dans le menu mobile */}
-        <img src="/logo.png" alt="CTK&BM" style={{
+        <img src="/logo-ctkbm.png" alt="CTK&BM" style={{
           width: 72, height: 72, borderRadius: '50%', objectFit: 'cover',
           border: '2px solid rgba(201,168,76,0.4)',
           marginBottom: 8,
