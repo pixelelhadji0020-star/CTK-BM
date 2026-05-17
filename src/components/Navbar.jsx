@@ -53,24 +53,23 @@ export default function Navbar() {
         }}>
 
           {/* Logo image */}
-          <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 110 }}>
-            <img
-              src="/logo.png"
-              alt="CTK&BM"
-              style={{ height: 44, width: 44, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(201,168,76,0.3)' }}
-              onError={e => { e.target.style.display = 'none'; }}
-            />
-            <span style={{
-              fontFamily: 'var(--font-display)', fontSize: 20,
-              letterSpacing: 3, color: 'var(--white)',
-            }}>
-              CTK<span style={{
-                background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              }}>&</span>BM
-            </span>
-          </Link>
-
+         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, zIndex: 110 }}>
+  <img
+    src="/logo-ctkbm.png" {/* <-- On change juste le nom du fichier ici */}
+    alt="CTK&BM"
+    style={{ height: 44, width: 44, borderRadius: '50%', objectFit: 'cover', border: '1px solid rgba(201,168,76,0.3)' }}
+    onError={e => { e.target.style.display = 'none'; }}
+  />
+  <span style={{
+    fontFamily: 'var(--font-display)', fontSize: 20,
+    letterSpacing: 3, color: 'var(--white)',
+  }}>
+    CTK<span style={{
+      background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
+      WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+    }}>&</span>BM
+  </span>
+</Link>
           {/* Desktop nav — Accueil / Catalogue / À propos */}
           <nav style={{ display: 'flex', gap: 36, alignItems: 'center' }} className="desktop-nav">
             <Link to="/" style={{
