@@ -212,61 +212,109 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CATALOGUE ── */}
-      <div id="catalogue" style={{ paddingTop: 8 }} />
-      {Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
-        byCategory[key].length > 0 && (
-          <section key={key} style={{ padding: '60px 0' }}>
-            <div className="container">
-              <div style={{
-                display: 'flex', justifyContent: 'space-between',
-                alignItems: 'flex-end', marginBottom: 28,
-                borderBottom: '1px solid var(--border)', paddingBottom: 16,
-              }}>
-                <div>
-                  <div style={{
-                    fontFamily: 'var(--font-condensed)', fontSize: 11,
-                    letterSpacing: 4, textTransform: 'uppercase',
-                    color: 'var(--gold)', marginBottom: 4,
-                  }}>
-                    {icon} Sélection
-                  </div>
-                  <h2 style={{
-                    fontFamily: 'var(--font-display)',
-                    fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2,
-                  }}>
-                    {label.toUpperCase()}
-                  </h2>
-                </div>
-                <Link to={`/categorie/${key}`} style={{
-                  display: 'flex', alignItems: 'center', gap: 5,
-                  fontFamily: 'var(--font-condensed)', fontSize: 13,
-                  letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-                  transition: 'gap 0.2s',
-                }}
-                  onMouseEnter={e => e.currentTarget.style.gap = '10px'}
-                  onMouseLeave={e => e.currentTarget.style.gap = '5px'}
-                >
-                  Tout voir <ArrowRight size={14} />
-                </Link>
-              </div>
+     {/* ── CATALOGUE ── */}
+<div id="catalogue" style={{ paddingTop: 8 }} />
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-                gap: 20,
-              }}>
-                {byCategory[key].map((product, i) => (
-                  <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
-                    <ProductCard product={product} />
-                  </div>
-                ))}
+{/* Voitures en 3 sous-sections */}
+<section style={{ padding: '60px 0' }}>
+  <div className="container">
+    <div style={{
+      borderBottom: '1px solid var(--border)', paddingBottom: 16, marginBottom: 36,
+    }}>
+      <h2 style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2,
+      }}>
+        VOITURES
+      </h2>
+    </div>
+
+    {[
+      { label: 'Récentes', filter: (p) => !p.badge || p.badge === 'Récente' },
+      { label: 'Premium / Neuves', filter: (p) => p.badge === 'Premium' || p.badge === 'Neuve' || p.badge === 'Nouveau' },
+      { label: 'Occasions', filter: (p) => p.badge === 'Occasion' },
+    ].map(({ label, filter }) => {
+      const items = products.filter(p => p.category === 'voitures' && filter(p));
+      if (!items.length) return null;
+      return (
+        <div key={label} style={{ marginBottom: 48 }}>
+          <div style={{
+            fontFamily: 'var(--font-condensed)', fontSize: 12,
+            letterSpacing: 3, textTransform: 'uppercase',
+            color: 'var(--gold)', marginBottom: 16,
+            paddingBottom: 8, borderBottom: '1px solid rgba(201,168,76,0.15)',
+          }}>
+            {label}
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+            gap: 20,
+          }}>
+            {items.slice(0, 3).map((product, i) => (
+              <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
+                <ProductCard product={product} />
               </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Link to="/categorie/voitures" style={{
+              fontFamily: 'var(--font-condensed)', fontSize: 13,
+              letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+            }}>
+              Tout voir <ArrowRight size={13} style={{ display: 'inline' }} />
+            </Link>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</section>
+
+{/* Téléphones + Chaussures */}
+{['telephones', 'chaussures'].map(key => {
+  const { label, icon } = CATEGORIES[key];
+  const items = byCategory[key];
+  if (!items.length) return null;
+  return (
+    <section key={key} style={{ padding: '60px 0' }}>
+      <div className="container">
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'flex-end', marginBottom: 28,
+          borderBottom: '1px solid var(--border)', paddingBottom: 16,
+        }}>
+          <div>
+            <h2 style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2,
+            }}>
+              {label.toUpperCase()}
+            </h2>
+          </div>
+          <Link to={`/categorie/${key}`} style={{
+            display: 'flex', alignItems: 'center', gap: 5,
+            fontFamily: 'var(--font-condensed)', fontSize: 13,
+            letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+          }}>
+            Tout voir <ArrowRight size={14} />
+          </Link>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+          gap: 20,
+        }}>
+          {items.map((product, i) => (
+            <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
+              <ProductCard product={product} />
             </div>
-          </section>
-        )
-      ))}
-
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+})}
       {/* ── À PROPOS — Formulaire véhicule ── */}
       <section id="apropos" style={{
         padding: '80px 20px',
