@@ -212,109 +212,155 @@ export default function Home() {
         </div>
       </section>
 
-     {/* ── CATALOGUE ── */}
+    {/* ── CATALOGUE ── */}
 <div id="catalogue" style={{ paddingTop: 8 }} />
 
 {/* Voitures en 3 sous-sections */}
-<section style={{ padding: '60px 0' }}>
-  <div className="container">
-    <div style={{
-      borderBottom: '1px solid var(--border)', paddingBottom: 16, marginBottom: 36,
-    }}>
-      <h2 style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2,
-      }}>
-        VOITURES
-      </h2>
-    </div>
+{(() => {
+  const voitures = Array.isArray(products) ? products.filter(p => p.category === 'voitures') : [];
+  if (!voitures.length) return null;
 
-    {[
-      { label: 'Récentes', filter: (p) => !p.badge || p.badge === 'Récente' },
-      { label: 'Premium / Neuves', filter: (p) => p.badge === 'Premium' || p.badge === 'Neuve' || p.badge === 'Nouveau' },
-      { label: 'Occasions', filter: (p) => p.badge === 'Occasion' },
-    ].map(({ label, filter }) => {
-      const items = products.filter(p => p.category === 'voitures' && filter(p));
-      if (!items.length) return null;
-      return (
-        <div key={label} style={{ marginBottom: 48 }}>
-          <div style={{
-            fontFamily: 'var(--font-condensed)', fontSize: 12,
-            letterSpacing: 3, textTransform: 'uppercase',
-            color: 'var(--gold)', marginBottom: 16,
-            paddingBottom: 8, borderBottom: '1px solid rgba(201,168,76,0.15)',
-          }}>
-            {label}
-          </div>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-            gap: 20,
-          }}>
-            {items.slice(0, 3).map((product, i) => (
-              <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 16, textAlign: 'right' }}>
-            <Link to="/categorie/voitures" style={{
-              fontFamily: 'var(--font-condensed)', fontSize: 13,
-              letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
-            }}>
-              Tout voir <ArrowRight size={13} style={{ display: 'inline' }} />
-            </Link>
-          </div>
-        </div>
-      );
-    })}
-  </div>
-</section>
+  const recentes = voitures.filter(p => !p.badge || (!['Premium','Neuve','Nouveau','Occasion'].includes(p.badge)));
+  const premium  = voitures.filter(p => p.badge && ['Premium','Neuve','Nouveau'].includes(p.badge));
+  const occasions = voitures.filter(p => p.badge === 'Occasion');
 
-{/* Téléphones + Chaussures */}
-{['telephones', 'chaussures'].map(key => {
-  const { label, icon } = CATEGORIES[key];
-  const items = byCategory[key];
-  if (!items.length) return null;
+  // Si aucun badge ne correspond, affiche tout dans Récentes
+  const allInRecentes = recentes.length === 0 && premium.length === 0 && occasions.length === 0;
+  const displayRecentes = allInRecentes ? voitures : recentes;
+
   return (
-    <section key={key} style={{ padding: '60px 0' }}>
+    <section style={{ padding: '60px 0' }}>
       <div className="container">
         <div style={{
-          display: 'flex', justifyContent: 'space-between',
-          alignItems: 'flex-end', marginBottom: 28,
-          borderBottom: '1px solid var(--border)', paddingBottom: 16,
+          borderBottom: '1px solid var(--border)',
+          paddingBottom: 16, marginBottom: 36,
         }}>
-          <div>
-            <h2 style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2,
-            }}>
-              {label.toUpperCase()}
-            </h2>
-          </div>
-          <Link to={`/categorie/${key}`} style={{
-            display: 'flex', alignItems: 'center', gap: 5,
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2,
+          }}>
+            VOITURES
+          </h2>
+        </div>
+
+        {[
+          { label: 'Récentes', items: displayRecentes },
+          { label: 'Premium / Neuves', items: premium },
+          { label: 'Occasions', items: occasions },
+        ].map(({ label, items }) => {
+          if (!items.length) return null;
+          return (
+            <div key={label} style={{ marginBottom: 44 }}>
+              <div style={{
+                fontFamily: 'var(--font-condensed)', fontSize: 12,
+                letterSpacing: 3, textTransform: 'uppercase',
+                color: 'var(--gold)', marginBottom: 16,
+                paddingBottom: 8,
+                borderBottom: '1px solid rgba(201,168,76,0.12)',
+              }}>
+                — {label}
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
+                gap: 20,
+              }}>
+                {items.slice(0, 3).map((product, i) => (
+                  <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
+              {items.length > 3 && (
+                <div style={{ marginTop: 14, textAlign: 'right' }}>
+                  <Link to="/categorie/voitures" style={{
+                    fontFamily: 'var(--font-condensed)', fontSize: 13,
+                    letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                  }}>
+                    Tout voir <ArrowRight size={13} />
+                  </Link>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        <div style={{ marginTop: 8, textAlign: 'right' }}>
+          <Link to="/categorie/voitures" style={{
             fontFamily: 'var(--font-condensed)', fontSize: 13,
             letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+            display: 'inline-flex', alignItems: 'center', gap: 4,
           }}>
-            Tout voir <ArrowRight size={14} />
+            Voir toutes les voitures <ArrowRight size={13} />
           </Link>
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))',
-          gap: 20,
-        }}>
-          {items.map((product, i) => (
-            <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
-              <ProductCard product={product} />
-            </div>
-          ))}
         </div>
       </div>
     </section>
   );
-})}
+})()}
+
+{/* Téléphones */}
+{byCategory['telephones']?.length > 0 && (
+  <section style={{ padding: '60px 0' }}>
+    <div className="container">
+      <div style={{
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'flex-end', marginBottom: 28,
+        borderBottom: '1px solid var(--border)', paddingBottom: 16,
+      }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2 }}>
+          TÉLÉPHONES
+        </h2>
+        <Link to="/categorie/telephones" style={{
+          display: 'flex', alignItems: 'center', gap: 5,
+          fontFamily: 'var(--font-condensed)', fontSize: 13,
+          letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+        }}>
+          Tout voir <ArrowRight size={14} />
+        </Link>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 20 }}>
+        {byCategory['telephones'].map((product, i) => (
+          <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+{/* Chaussures */}
+{byCategory['chaussures']?.length > 0 && (
+  <section style={{ padding: '60px 0' }}>
+    <div className="container">
+      <div style={{
+        display: 'flex', justifyContent: 'space-between',
+        alignItems: 'flex-end', marginBottom: 28,
+        borderBottom: '1px solid var(--border)', paddingBottom: 16,
+      }}>
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(30px, 7vw, 50px)', letterSpacing: 2 }}>
+          CHAUSSURES
+        </h2>
+        <Link to="/categorie/chaussures" style={{
+          display: 'flex', alignItems: 'center', gap: 5,
+          fontFamily: 'var(--font-condensed)', fontSize: 13,
+          letterSpacing: 2, textTransform: 'uppercase', color: 'var(--gold)',
+        }}>
+          Tout voir <ArrowRight size={14} />
+        </Link>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(270px, 1fr))', gap: 20 }}>
+        {byCategory['chaussures'].map((product, i) => (
+          <div key={product.id} style={{ animation: `fadeUp 0.5s ${i * 0.08}s both` }}>
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
       {/* ── À PROPOS — Formulaire véhicule ── */}
       <section id="apropos" style={{
         padding: '80px 20px',
