@@ -16,7 +16,7 @@ export default function Home() {
         const data = await getProducts();
         setProducts(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error('Erreur:', err);
+        console.error('Erreur chargement:', err);
         setProducts([]);
       } finally {
         setLoading(false);
@@ -33,72 +33,131 @@ export default function Home() {
   function handleWhatsApp(e) {
     e.preventDefault();
     const { prenom, nom, telephone, vehicule } = formData;
-    if (!prenom || !nom || !telephone || !vehicule) return;
-    const msg = `Bonjour CTK&BM ! 🚗 Recherche Véhicule sous 48h :\n\nPrénom : ${prenom}\nNom : ${nom}\nTéléphone : ${telephone}\nVéhicule : ${vehicule}`;
+    if (!prenom || !nom || !telephone || !vehicule) {
+      alert('Veuillez remplir tous les champs.');
+      return;
+    }
+    const msg = `Bonjour CTK&BM ! 🚗 Recherche Véhicule sous 48h :\n\nPrénom : ${prenom}\nNom : ${nom}\nTéléphone : ${telephone}\nVéhicule souhaité : ${vehicule}`;
     window.open(`https://wa.me/221776729740?text=${encodeURIComponent(msg)}`, '_blank');
   }
 
   return (
     <div style={{ background: 'var(--bg)', color: 'var(--text)', minHeight: '100vh' }}>
       
-      {/* SECTION HERO AVEC LOGO CENTRAL */}
+      {/* STRUCTURE D'ORIGINE DE CLAUDE RESTAURÉE */}
       <section style={{
-        position: 'relative', minHeight: '85vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '120px 24px 60px 24px', overflow: 'hidden', background: '#0a0a0a'
+        position: 'relative',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '120px 20px 80px 20px',
+        overflow: 'hidden',
+        background: '#0a0a0a'
       }}>
+        {/* Filigrane du logo en arrière-plan */}
         <div style={{
-          position: 'absolute', inset: 0, opacity: 0.05,
-          backgroundImage: 'url("/logo-ctkbm.png")', backgroundPosition: 'center',
-          backgroundSize: 'contain', backgroundRepeat: 'no-repeat', pointerEvents: 'none'
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'url("/logo-ctkbm.png")',
+          backgroundPosition: 'center',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          opacity: 0.04,
+          pointerEvents: 'none',
+          zIndex: 1
+        }} />
+
+        {/* Dégradé radial d'ambiance d'origine */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'radial-gradient(circle at center, rgba(20,20,20,0.2) 0%, #0a0a0a 100%)',
+          zIndex: 1,
+          pointerEvents: 'none'
         }} />
 
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 800, textAlign: 'center' }}>
           
-          {/* AFFICHAGE DU LOGO DANS LA PREMIÈRE SECTION */}
-          <img 
-            src="/logo-ctkbm.png" 
-            alt="CTK & BM" 
-            style={{
-              maxWidth: '200px',
-              height: 'auto',
-              marginBottom: 28,
-              filter: 'drop-shadow(0px 10px 30px rgba(0,0,0,0.7))'
-            }}
-          />
+          {/* Logo d'image principal au centre */}
+          <div style={{ marginBottom: 32, display: 'flex', justifyContent: 'center' }}>
+            <img 
+              src="/logo-ctkbm.png" 
+              alt="CTK & BM" 
+              style={{
+                maxWidth: '220px',
+                height: 'auto',
+                filter: 'drop-shadow(0px 10px 30px rgba(0,0,0,0.7))',
+                display: 'block'
+              }}
+              onError={(e) => {
+                // Secours visuel si l'image rencontre un problème de chemin
+                e.currentTarget.style.display = 'none';
+                if(e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
+              }}
+            />
+            <div style={{
+              display: 'none',
+              fontFamily: 'var(--font-display)',
+              fontSize: '42px',
+              letterSpacing: '4px',
+              color: '#fff'
+            }}>
+              CTK & BM
+            </div>
+          </div>
 
           <h1 style={{
-            fontFamily: 'var(--font-display)', fontSize: 'clamp(36px, 7vw, 68px)',
-            lineHeight: 1.05, letterSpacing: -1, marginBottom: 20, textTransform: 'uppercase'
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(38px, 7.5vw, 72px)',
+            lineHeight: 1.05,
+            letterSpacing: '-1px',
+            marginBottom: 24,
+            textTransform: 'uppercase'
           }}>
-            L'Équilibre Parfait<br/>Du Style & De La Puissance
+            L'Équilibre Parfait<br />Du Style & De La Puissance
           </h1>
+
           <p style={{
-            color: 'var(--grey)', fontSize: 'clamp(15px, 2.2vw, 18px)',
-            maxWidth: 540, margin: '0 auto 40px auto', lineHeight: 1.6
+            color: 'var(--grey)',
+            fontSize: 'clamp(15px, 2.3vw, 18px)',
+            maxWidth: 540,
+            margin: '0 auto 48px auto',
+            lineHeight: 1.6
           }}>
             Votre univers exclusif à Dakar : Véhicules d'exception, Smartphones haut de gamme et Sneakers de collection.
           </p>
+
           <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="#catalogue" style={{
               background: 'linear-gradient(90deg, var(--gold), var(--gold-light))',
-              color: '#000', padding: '16px 36px', borderRadius: 99,
+              color: '#000', padding: '16px 38px', borderRadius: 99,
               fontFamily: 'var(--font-condensed)', fontSize: 14, fontWeight: 700,
-              letterSpacing: 2, textTransform: 'uppercase', textDecoration: 'none'
+              letterSpacing: 2, textTransform: 'uppercase', textDecoration: 'none',
+              boxShadow: '0 4px 20px rgba(201, 168, 76, 0.15)'
             }}>
               Explorer le catalogue
             </a>
           </div>
+
         </div>
       </section>
 
-      {/* CATALOGUE */}
+      {/* SECTION CATALOGUE */}
       <section id="catalogue" style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto' }}>
         {loading ? (
-          <p style={{ textAlign: 'center', color: 'var(--grey)' }}>Chargement...</p>
+          <p style={{ textAlign: 'center', color: 'var(--grey)' }}>Chargement du catalogue...</p>
         ) : (
           Object.entries(CATEGORIES).map(([key, { label, icon }]) => (
             <div key={key} style={{ marginBottom: 80 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 32, borderBottom: '1px solid var(--border)', paddingBottom: 12 }}>
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'baseline', 
+                marginBottom: 32, 
+                borderBottom: '1px solid var(--border)', 
+                paddingBottom: 12 
+              }}>
                 <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(22px, 4vw, 32px)', letterSpacing: 1, textTransform: 'uppercase' }}>
                   <span style={{ marginRight: 12, fontSize: '0.8em' }}>{icon}</span>{label}
                 </h2>
@@ -114,7 +173,7 @@ export default function Home() {
         )}
       </section>
 
-      {/* FORMULAIRE 48H */}
+      {/* SECTION RECHERCHE DE VÉHICULE 48H */}
       <section id="apropos" style={{ padding: '100px 24px', background: 'var(--card-bg)', borderTop: '1px solid var(--border)' }}>
         <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
           <span style={{ fontFamily: 'var(--font-condensed)', color: 'var(--gold)', fontSize: 12, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase' }}>Service Premium</span>
@@ -149,6 +208,7 @@ export default function Home() {
         </div>
       </section>
 
+      {/* BALISE DE STYLE RESPONSIVE SÉCURISÉE */}
       <style>{`
         @media (max-width: 560px) {
           .form-grid { grid-template-columns: 1fr !important; }
